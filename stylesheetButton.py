@@ -15,19 +15,21 @@ from PySide.QtCore import *
 from PySide.QtGui import *
 
 BUTTON_SYTLE = '''
-                 QPushButton {
-                     border: 2px solid #8f8f91;
-                     border-radius: 20px;
-                     background-color: rgb(176, 189, 194);
-                     color: rgb(255, 0, 0); 
-                     font: 10pt "MS Shell Dlg 2";
-                     min-width: 80px;
-                     min-height: 80px;  
-                 }
+                QPushButton {
+                    border-radius: 20px; 
+                    background-color: rgb(176, 189, 194);
+                    color: rgb(255, 0, 0); 
+                    font: 10pt "MS Shell Dlg 2";
+                    min-width: 80px;
+                    min-height: 80px;  
+                }
 
-                 QPushButton:pressed {
-                     background-color: rgb(98, 105, 108);
-                 }
+                QPushButton:hover {  
+                    border: 2px solid #8f8f91; 
+                }
+                QPushButton:pressed {
+                    background-color: rgb(98, 105, 108);
+                }
                 '''  
                 
 #######################################
