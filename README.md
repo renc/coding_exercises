@@ -1,7 +1,7 @@
 coding_exercises
 ================
 
-There are some times i try to implement basic algorithms, and keep them here. 
+There are some times I try to implement basic algorithms, and keep them here. 
 
 
 Samples: 
@@ -19,6 +19,8 @@ step 2. to compute the total number of comparisons used to sort the given  array
 dragButton.py       at 2014/8/25. Qt+pySide: drag&drop buttons;     
 stylesheetButton.py at 2014/8/25. Qt+pySide: custom define the style sheet of a button.         
 
-
+glExample 
+mainTexExample.cpp  at 2015/7 simple example to use texture. 
+ 
 
   
