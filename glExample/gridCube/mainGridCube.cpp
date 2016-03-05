@@ -41,6 +41,24 @@ void update_fps_counter(GLFWwindow *window)
 	}
 }
 
+float *build_triangle()
+{
+	// 3 points, every point is vec3f
+	  
+	float *points = new float[3*3];
+	points[0] = -0.5f;
+	points[1] = -0.5f;
+	points[2] = 0;
+	points[3] = 0.5f;
+	points[4] = -0.5f;
+	points[5] = 0;
+	points[6] = 0;
+	points[7] = 0.5f;
+	points[8] = 0; 
+
+	return points;
+}
+
 int main()
 {
 
@@ -86,11 +104,15 @@ int main()
 	// geometry data
 	unsigned int iPointCount = 3; 
 	unsigned int iVtxDim = 3; // vec3f
-	float points[] = {
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f, 0.5f, 0.0f
-	};
+	float *points = NULL;
+	points = build_triangle();
+
+	//unsigned int iPointDataSize = sizeof(points); iPointDataSize;
+	//if (iPointDataSize != sizeof(float) * 9) 
+	//{ 
+	//	fprintf(stderr, "Error: point data size.\n");  
+	//	return 1; 
+	//};
 
 	GLuint vbo = 0;
 	glGenBuffers(1, &vbo);
