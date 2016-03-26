@@ -2,7 +2,7 @@
 svg Demo 
 ---- 
 
-![Screen Shot](svgDemo_sceenShot.PNG "output") 
+![Screen Shot](svgDemo_screenShot.PNG "output") 
                                                                                     
 in this small qt demo, try to learn a bit of the Graphics View framework.                
 1. scene, add items to scene, use view to show the scene;                 

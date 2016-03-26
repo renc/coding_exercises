@@ -22,5 +22,7 @@ stylesheetButton.py at 2014/8/25. Qt+pySide: custom define the style sheet of a 
 glExample 
 mainTexExample.cpp  at 2015/7 simple example to use texture. 
  
+svgDemo at 2016/3/26, qt, svg, graphics view.      
+                     
 
   
