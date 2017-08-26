@@ -1,0 +1,180 @@
+﻿<!DOCTYPE HTML>
+<!DOCTYPE html PUBLIC "" ""><HTML><HEAD>
+<META http-equiv="Content-Type" content="text/html; charset=utf-8"></HEAD>
+<BODY>
+<PRE>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003"&gt;
+
+  &lt;ItemGroup Label="ProjectConfigurations"&gt;
+
+    &lt;ProjectConfiguration Include="Debug|x64"&gt;
+      &lt;Configuration&gt;Debug&lt;/Configuration&gt;
+      &lt;Platform&gt;x64&lt;/Platform&gt;
+    &lt;/ProjectConfiguration&gt;
+
+    &lt;ProjectConfiguration Include="ReleaseDebug|x64"&gt;
+      &lt;Configuration&gt;ReleaseDebug&lt;/Configuration&gt;
+      &lt;Platform&gt;x64&lt;/Platform&gt;
+    &lt;/ProjectConfiguration&gt;
+
+    &lt;ProjectConfiguration Include="Release|x64"&gt;
+      &lt;Configuration&gt;Release&lt;/Configuration&gt;
+      &lt;Platform&gt;x64&lt;/Platform&gt;
+    &lt;/ProjectConfiguration&gt;
+
+  &lt;/ItemGroup&gt;
+
+  &lt;PropertyGroup Label="Globals"&gt;
+    &lt;Keyword&gt;Win32Proj&lt;/Keyword&gt;
+  &lt;/PropertyGroup&gt;
+
+  &lt;Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" /&gt;
+
+  &lt;PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration"&gt;
+    &lt;ConfigurationType&gt;DynamicLibrary&lt;/ConfigurationType&gt;
+    &lt;UseDebugLibraries&gt;true&lt;/UseDebugLibraries&gt;
+    &lt;PlatformToolset&gt;v110&lt;/PlatformToolset&gt;
+  &lt;/PropertyGroup&gt;
+
+  &lt;PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'" Label="Configuration"&gt;
+    &lt;ConfigurationType&gt;DynamicLibrary&lt;/ConfigurationType&gt;
+    &lt;UseDebugLibraries&gt;false&lt;/UseDebugLibraries&gt;
+    &lt;PlatformToolset&gt;v110&lt;/PlatformToolset&gt;
+  &lt;/PropertyGroup&gt;
+
+  &lt;PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration"&gt;
+    &lt;ConfigurationType&gt;DynamicLibrary&lt;/ConfigurationType&gt;
+    &lt;UseDebugLibraries&gt;false&lt;/UseDebugLibraries&gt;
+    &lt;PlatformToolset&gt;v110&lt;/PlatformToolset&gt;
+  &lt;/PropertyGroup&gt;
+
+  &lt;Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" /&gt;
+
+  &lt;ImportGroup Label="ExtensionSettings"&gt;
+  &lt;/ImportGroup&gt;
+
+  &lt;ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets"&gt;
+    &lt;Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" /&gt;
+	&lt;Import Project="sineNode.props" Condition="exists('sineNode.props')" /&gt;
+  &lt;/ImportGroup&gt;
+
+  &lt;ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'" Label="PropertySheets"&gt;
+    &lt;Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" /&gt;
+	&lt;Import Project="sineNode.props" Condition="exists('sineNode.props')" /&gt;
+  &lt;/ImportGroup&gt;
+
+  &lt;ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets"&gt;
+    &lt;Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" /&gt;
+	&lt;Import Project="sineNode.props" Condition="exists('sineNode.props')" /&gt;
+  &lt;/ImportGroup&gt;
+
+  &lt;PropertyGroup Label="UserMacros" /&gt;
+
+  &lt;PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"&gt;
+    &lt;LinkIncremental&gt;true&lt;/LinkIncremental&gt;
+    &lt;OutDir&gt;$(Platform)\$(Configuration)\&lt;/OutDir&gt;
+    &lt;TargetExt&gt;.mll&lt;/TargetExt&gt;
+    &lt;CodeAnalysisRuleSet&gt;AllRules.ruleset&lt;/CodeAnalysisRuleSet&gt;
+  &lt;/PropertyGroup&gt;
+
+  &lt;ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"&gt;
+    &lt;ClCompile&gt;
+      &lt;PreprocessorDefinitions&gt;_DEBUG;WIN32;_WINDOWS;_USRDLL;NT_PLUGIN;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;_SECURE_SCL_THROWS=0;_SECURE_SCL_DEPRECATE=0;_CRT_SECURE_NO_DEPRECATE;TBB_USE_DEBUG=0;__TBB_LIB_NAME=tbb.lib;Bits64_;%(PreprocessorDefinitions)&lt;/PreprocessorDefinitions&gt;
+      &lt;AdditionalIncludeDirectories&gt;.;..\..\..\include;..\..\..\..\include;%(AdditionalIncludeDirectories)&lt;/AdditionalIncludeDirectories&gt;
+      &lt;RuntimeLibrary&gt;MultiThreadedDebugDLL&lt;/RuntimeLibrary&gt;
+      &lt;WarningLevel&gt;Level3&lt;/WarningLevel&gt;
+      &lt;DebugInformationFormat&gt;ProgramDatabase&lt;/DebugInformationFormat&gt;
+      &lt;RuntimeTypeInfo&gt;true&lt;/RuntimeTypeInfo&gt;
+      &lt;ProgramDataBaseFileName&gt;$(IntDir)$(ProjectName).pdb&lt;/ProgramDataBaseFileName&gt;
+      &lt;Optimization&gt;Disabled&lt;/Optimization&gt;
+    &lt;/ClCompile&gt;
+
+    &lt;Link&gt;
+      &lt;GenerateDebugInformation&gt;true&lt;/GenerateDebugInformation&gt;
+      &lt;SubSystem&gt;Windows&lt;/SubSystem&gt;
+      &lt;AdditionalLibraryDirectories&gt;..\..\..\lib;..\..\..\..\lib;%(AdditionalLibraryDirectories)&lt;/AdditionalLibraryDirectories&gt;
+      &lt;AdditionalDependencies&gt;OpenMaya.lib;Foundation.lib;%(AdditionalDependencies)&lt;/AdditionalDependencies&gt;
+&lt;AdditionalOptions&gt;/export:initializePlugin /export:uninitializePlugin %(AdditionalOptions)&lt;/AdditionalOptions&gt;
+      &lt;RandomizedBaseAddress&gt;false&lt;/RandomizedBaseAddress&gt;
+      &lt;ImportLibrary&gt;$(OutDir)$(TargetName).lib&lt;/ImportLibrary&gt;
+    &lt;/Link&gt;
+  &lt;/ItemDefinitionGroup&gt;
+
+  &lt;PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'"&gt;
+    &lt;LinkIncremental&gt;false&lt;/LinkIncremental&gt;
+    &lt;OutDir&gt;$(Platform)\$(Configuration)\&lt;/OutDir&gt;
+    &lt;TargetExt&gt;.mll&lt;/TargetExt&gt;
+    &lt;CodeAnalysisRuleSet&gt;AllRules.ruleset&lt;/CodeAnalysisRuleSet&gt;
+  &lt;/PropertyGroup&gt;
+
+  &lt;ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'"&gt;
+    &lt;ClCompile&gt;
+      &lt;PreprocessorDefinitions&gt;NDEBUG;WIN32;_WINDOWS;_USRDLL;NT_PLUGIN;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;_SECURE_SCL_THROWS=0;_SECURE_SCL_DEPRECATE=0;_CRT_SECURE_NO_DEPRECATE;TBB_USE_DEBUG=0;__TBB_LIB_NAME=tbb.lib;Bits64_;%(PreprocessorDefinitions)&lt;/PreprocessorDefinitions&gt;
+      &lt;AdditionalIncludeDirectories&gt;.;..\..\..\include;..\..\..\..\include;%(AdditionalIncludeDirectories)&lt;/AdditionalIncludeDirectories&gt;
+      &lt;RuntimeLibrary&gt;MultiThreadedDLL&lt;/RuntimeLibrary&gt;
+      &lt;WarningLevel&gt;Level3&lt;/WarningLevel&gt;
+      &lt;DebugInformationFormat&gt;ProgramDatabase&lt;/DebugInformationFormat&gt;
+      &lt;RuntimeTypeInfo&gt;true&lt;/RuntimeTypeInfo&gt;
+      &lt;ProgramDataBaseFileName&gt;$(IntDir)$(ProjectName).pdb&lt;/ProgramDataBaseFileName&gt;
+      &lt;InlineFunctionExpansion&gt;OnlyExplicitInline&lt;/InlineFunctionExpansion&gt;
+      &lt;StringPooling&gt;true&lt;/StringPooling&gt;
+      &lt;FunctionLevelLinking&gt;true&lt;/FunctionLevelLinking&gt;
+    &lt;/ClCompile&gt;
+
+    &lt;Link&gt;
+      &lt;GenerateDebugInformation&gt;true&lt;/GenerateDebugInformation&gt;
+      &lt;SubSystem&gt;Windows&lt;/SubSystem&gt;
+      &lt;AdditionalLibraryDirectories&gt;..\..\..\lib;..\..\..\..\lib;%(AdditionalLibraryDirectories)&lt;/AdditionalLibraryDirectories&gt;
+      &lt;AdditionalDependencies&gt;OpenMaya.lib;Foundation.lib;%(AdditionalDependencies)&lt;/AdditionalDependencies&gt;
+&lt;AdditionalOptions&gt;/export:initializePlugin /export:uninitializePlugin %(AdditionalOptions)&lt;/AdditionalOptions&gt;
+      &lt;RandomizedBaseAddress&gt;false&lt;/RandomizedBaseAddress&gt;
+      &lt;ImportLibrary&gt;$(OutDir)$(TargetName).lib&lt;/ImportLibrary&gt;
+      &lt;EnableCOMDATFolding&gt;true&lt;/EnableCOMDATFolding&gt;
+      &lt;OptimizeReferences&gt;true&lt;/OptimizeReferences&gt;
+    &lt;/Link&gt;
+  &lt;/ItemDefinitionGroup&gt;
+
+  &lt;PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'"&gt;
+    &lt;LinkIncremental&gt;false&lt;/LinkIncremental&gt;
+    &lt;OutDir&gt;$(Platform)\$(Configuration)\&lt;/OutDir&gt;
+    &lt;TargetExt&gt;.mll&lt;/TargetExt&gt;
+    &lt;CodeAnalysisRuleSet&gt;AllRules.ruleset&lt;/CodeAnalysisRuleSet&gt;
+  &lt;/PropertyGroup&gt;
+
+  &lt;ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'"&gt;
+    &lt;ClCompile&gt;
+      &lt;PreprocessorDefinitions&gt;NDEBUG;WIN32;_WINDOWS;_USRDLL;NT_PLUGIN;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;_SECURE_SCL_THROWS=0;_SECURE_SCL_DEPRECATE=0;_CRT_SECURE_NO_DEPRECATE;TBB_USE_DEBUG=0;__TBB_LIB_NAME=tbb.lib;Bits64_;%(PreprocessorDefinitions)&lt;/PreprocessorDefinitions&gt;
+      &lt;AdditionalIncludeDirectories&gt;.;..\..\..\include;..\..\..\..\include;%(AdditionalIncludeDirectories)&lt;/AdditionalIncludeDirectories&gt;
+      &lt;RuntimeLibrary&gt;MultiThreadedDLL&lt;/RuntimeLibrary&gt;
+      &lt;WarningLevel&gt;Level3&lt;/WarningLevel&gt;
+      &lt;DebugInformationFormat&gt;ProgramDatabase&lt;/DebugInformationFormat&gt;
+      &lt;RuntimeTypeInfo&gt;true&lt;/RuntimeTypeInfo&gt;
+      &lt;ProgramDataBaseFileName&gt;$(IntDir)$(ProjectName).pdb&lt;/ProgramDataBaseFileName&gt;
+      &lt;InlineFunctionExpansion&gt;OnlyExplicitInline&lt;/InlineFunctionExpansion&gt;
+      &lt;StringPooling&gt;true&lt;/StringPooling&gt;
+      &lt;FunctionLevelLinking&gt;true&lt;/FunctionLevelLinking&gt;
+    &lt;/ClCompile&gt;
+
+    &lt;Link&gt;
+      &lt;GenerateDebugInformation&gt;false&lt;/GenerateDebugInformation&gt;
+      &lt;SubSystem&gt;Windows&lt;/SubSystem&gt;
+      &lt;AdditionalLibraryDirectories&gt;..\..\..\lib;..\..\..\..\lib;%(AdditionalLibraryDirectories)&lt;/AdditionalLibraryDirectories&gt;
+      &lt;AdditionalDependencies&gt;OpenMaya.lib;Foundation.lib;%(AdditionalDependencies)&lt;/AdditionalDependencies&gt;
+&lt;AdditionalOptions&gt;/export:initializePlugin /export:uninitializePlugin %(AdditionalOptions)&lt;/AdditionalOptions&gt;
+      &lt;RandomizedBaseAddress&gt;false&lt;/RandomizedBaseAddress&gt;
+      &lt;ImportLibrary&gt;$(OutDir)$(TargetName).lib&lt;/ImportLibrary&gt;
+      &lt;EnableCOMDATFolding&gt;true&lt;/EnableCOMDATFolding&gt;
+      &lt;OptimizeReferences&gt;true&lt;/OptimizeReferences&gt;
+    &lt;/Link&gt;
+  &lt;/ItemDefinitionGroup&gt;
+
+  &lt;ItemGroup&gt;
+    &lt;ClCompile Include="sineNode.cpp" /&gt;
+  &lt;/ItemGroup&gt;
+
+  &lt;Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" /&gt;
+
+  &lt;ImportGroup Label="ExtensionTargets"&gt;
+  &lt;/ImportGroup&gt;
+&lt;/Project&gt;
+</PRE></BODY></HTML>

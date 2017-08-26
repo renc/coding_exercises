@@ -37,13 +37,17 @@ int main()
 {                
 	int a = 0;                  
 	std::cout << "init: " << a << ", " << &a << std::endl;        
-	func1( &a );       
-	func2( a );            
+	func1( &a );      
+	std::cout << "a = " << a << std::endl;
+	func2( a );
+	std::cout << "a = " << a << std::endl;
 	     
 	B Binstance;        
 	std::cout << "init: " << &Binstance << std::endl;           
 	func3( &Binstance );           
 	func4( Binstance );             
-	             
+
+	int input; 
+	std::cin >> input;
 	return 1;          
 }            

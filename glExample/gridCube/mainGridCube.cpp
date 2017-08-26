@@ -41,6 +41,22 @@ void update_fps_counter(GLFWwindow *window)
 	}
 }
 
+struct Cube
+{
+	Cube()
+	{
+		float temp[24] = {0, 0, 0,  1, 0, 0,  1, 0, 1,   0, 0, 1, 
+		                  0, 1, 0,  1, 1, 0,  1, 1, 1,   0, 1, 1};
+		for (unsigned int i = 0; i < 24; ++i) pos[i] = temp[24];
+
+		unsigned int tempElem[36] = {0,1,2,  0,2,3,    0,4,5, 0,5,1,
+		1,5,6,  1,6,2,   3,2,6, 3,6,7,   
+		3,7,4, 3,4,0,   4,7,6, 4,6,5};
+		for (unsigned int i = 0; i < 36; ++i) elem[i] = tempElem[i];
+	}
+	float pos[8*3];
+	unsigned int elem[6*6];
+};
 float *build_triangle()
 {
 	// 3 points, every point is vec3f
@@ -120,6 +136,12 @@ int main()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*iPointCount*iVtxDim, points,
 		GL_STATIC_DRAW);
 
+	if (points)
+	{
+		delete points;
+		points = NULL;
+	}
+
 	// Most meshes will use a collection of one or more vertex buffer
 	// objects to hold vertex points, tex-coordinates, vertex normals,
 	// ectc. In older GL implementions we would have to bind each one,
@@ -189,7 +211,7 @@ int main()
 		// try to disale this use program, check the scene.
 		glUseProgram(shader_programme);
 		
-		glBindVertexArray(vao);
+		glBindVertexArray(vao);//bind vao means use the vtx data/format
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		// put the stuff we've been drawing onto the display

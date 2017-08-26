@@ -2,8 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QWidget>
 
-class MainWindow : public QMainWindow
+class MainWindow : public QWidget //QMainWindow
 {
     Q_OBJECT
 

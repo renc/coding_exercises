@@ -2,6 +2,9 @@
 #include <QtSvg/QtSvg>
 #include <QtWidgets/QtWidgets>
 
+static const QString svgFile1 = "D:\\Users\\renc\\Documents\\GitHub\\coding_exercises\\svgDemo\\method-draw-image1.svg";
+static const QString svgFile2 = "D:\\Users\\renc\\Documents\\GitHub\\coding_exercises\\svgDemo\\rect2.svg";
+
 class SvgPushButton : public QPushButton
 {
 public:
@@ -21,7 +24,7 @@ public:
 
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+    : QWidget(parent)
 {
     // create a scene with items,
     // use the view to show the scene
@@ -40,37 +43,39 @@ MainWindow::MainWindow(QWidget *parent)
         scene->addRect(QRectF(0,0,50,50), QPen(Qt::red), QBrush(Qt::green));
 
         // svg image
-        QGraphicsSvgItem *svgItem = new QGraphicsSvgItem(
-            "D:/rect2.svg");
+        QGraphicsSvgItem *svgItem = new QGraphicsSvgItem(svgFile2);
         scene->addItem((svgItem));
-        svgItem->setPos(200, 0);
+        svgItem->setPos(400, 0);
         bool rValid1 = svgItem->renderer()->isValid();
         printf("--%d--\n", rValid1);
 
         // QWidget to scene
         QPushButton *btn = new QPushButton("button 1");// at (0,0) by default.
         QGraphicsProxyWidget *btnWidget = scene->addWidget(btn);
-        btnWidget->setPos(0, 100);
+        btnWidget->setPos(0, 400);
 
         //
         {
-            SvgPushButton *btn2 = new SvgPushButton("D:/method-draw-image1.svg");
+            SvgPushButton *btn2 = new SvgPushButton(svgFile1);
             QGraphicsProxyWidget *btnWidget2 = scene->addWidget(btn2);
-            btnWidget2->setPos(0, 150);
+            btnWidget2->setPos(400, 400);
         }
     }
     else
         printf("renc: scene is null.\n");
-    setCentralWidget(gv);
 
-
-    setWindowTitle("Demo: graphics view");
+    //setCentralWidget(gv); setWindowTitle("Demo: graphics view");//QMainWindow
+    setStyleSheet("background-color: rgb(100,120,50);");
 }
 
 MainWindow::~MainWindow()
 {
 
 }
+
+
+// 2016/5/3, used QMainWindow as base class.
+// change to use QWidget as base class.
 
 // renc: 2016/3/26
 // in this demo, try to learn a bit of the Graphics View framework.
