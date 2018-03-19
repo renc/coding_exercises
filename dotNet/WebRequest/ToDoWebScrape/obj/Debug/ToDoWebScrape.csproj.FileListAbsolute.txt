@@ -1,0 +1,9 @@
+d:\Users\renc\Documents\GitHub\coding_exercises\dotNet\WebRequest\ToDoWebScrape\bin\Debug\ToDoWebScrape.exe.config
+d:\Users\renc\Documents\GitHub\coding_exercises\dotNet\WebRequest\ToDoWebScrape\bin\Debug\ToDoWebScrape.exe
+d:\Users\renc\Documents\GitHub\coding_exercises\dotNet\WebRequest\ToDoWebScrape\bin\Debug\ToDoWebScrape.pdb
+d:\Users\renc\Documents\GitHub\coding_exercises\dotNet\WebRequest\ToDoWebScrape\obj\Debug\ToDoWebScrape.csprojResolveAssemblyReference.cache
+d:\Users\renc\Documents\GitHub\coding_exercises\dotNet\WebRequest\ToDoWebScrape\obj\Debug\ToDoWebScrape.exe
+d:\Users\renc\Documents\GitHub\coding_exercises\dotNet\WebRequest\ToDoWebScrape\obj\Debug\ToDoWebScrape.pdb
+D:\Users\renc\Documents\GitHub\coding_exercises\dotNet\WebRequest\ToDoWebScrape\bin\Debug\HtmlAgilityPack.dll
+D:\Users\renc\Documents\GitHub\coding_exercises\dotNet\WebRequest\ToDoWebScrape\bin\Debug\HtmlAgilityPack.pdb
+D:\Users\renc\Documents\GitHub\coding_exercises\dotNet\WebRequest\ToDoWebScrape\bin\Debug\HtmlAgilityPack.xml
