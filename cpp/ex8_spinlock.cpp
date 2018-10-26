@@ -38,6 +38,7 @@ Output from thread: 9
 #include <iostream>
 #include <atomic>
 #include <thread>
+#include <mutex>
 #include <vector> 
 
 // to define a SpinLock 
@@ -60,12 +61,14 @@ class SpinLock {
 
 };
 
-SpinLock g_Lock;
+SpinLock g_Lock; // this will fully utilize the cpu, cpu is upto 100%
+//std::mutex g_Lock; // this will not fully utilize the cpu
 void func(int n)
 {
     g_Lock.lock();
     std::cout << "Output from thread: " << n << std::endl;
-    g_Lock.unlock();
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    g_Lock.unlock(); 
 }
 int main()
 {
