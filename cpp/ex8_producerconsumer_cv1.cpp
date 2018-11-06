@@ -38,7 +38,8 @@ void consume(int n)
 	{
 		// wait until the queue is not empty
 		std::unique_lock<std::mutex> lk(cv_m); //必须是unique_lock,而且是同一个cv_m; 
-		cv.wait(lk, [] { return !g_q.empty(); }); // == while (g_q.empty()) { cv.wait(lk); } // after the wait, we own the lock.
+		cv.wait(lk, [] { return !g_q.empty(); }); 
+		// == while (g_q.empty()) { cv.wait(lk); } // after the wait, we own the lock.
 		int a = g_q.front(); 
 		g_q.pop();
 		std::cout << a << std::endl;

@@ -1,6 +1,7 @@
 /*
 To build: 
-g++ ex1_num.cpp -o ex1_num -std=c++11 
+g++ ex1_num.cpp -o ex1_num -std=c++11 -g 
+// -g is need for debug
 */ 
 #include <vector>
 #include <string> 
@@ -33,10 +34,11 @@ std::vector<int> getDigits(int num, bool bOrder=true)
 int main()
 {
     std::cout << vector2string(getDigits(8973240)) << std::endl;
+    std::cout << vector2string(getDigits(0)) << std::endl;
     assert( vector2string(getDigits(0)) == "0" );
     assert( vector2string(getDigits(10)) == "10" );
     assert( vector2string(getDigits(190)) == "190" );
     assert( vector2string(getDigits(195)) == "195" );
     assert( vector2string(getDigits(8973240)) == "8973240" );
-    return 1;
+    return 0; // exist status, 0 success. 
 }

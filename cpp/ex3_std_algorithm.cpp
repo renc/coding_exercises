@@ -58,5 +58,5 @@ int main()
 {
     test_std_transform();
     test_std_for_each();
-    return 1;
+    return 0; // exist status, 0 success. 
 }
