@@ -40,5 +40,6 @@ int main()
     assert( vector2string(getDigits(190)) == "190" );
     assert( vector2string(getDigits(195)) == "195" );
     assert( vector2string(getDigits(8973240)) == "8973240" );
+ 
     return 0; // exist status, 0 success. 
 }

@@ -1,8 +1,22 @@
-
+#include <cstdlib> 
+#include <cstring> 
 #include <string> 
 #include <iostream>
 #include <sstream> // for std::istringstream 
 #include <assert.h>
+
+char *strcpy1(char *to, const char *from) 
+{
+	if (from == NULL) return NULL;
+	if (to == from) return to;
+    std::cout <<  strlen(to) << ", " << strlen(from) << std::endl;
+    char *head = to; // how about not enough memory for to ?
+    int i = 0;
+	for (; from[i] != '\0'; ++i) // how about not nul terminated?
+		to[i] = from[i];
+    to[i] = '\0'; // forget ths ?
+    return head;
+}
 
 // function to remove all spaces.
 bool myIsSpace(char ch)
@@ -37,6 +51,10 @@ void getWordsFromString(const std::string &str)
 
 int main()
 {
+    {
+        char to[10], from[]=" hello _";
+        std::cout << strcpy1(to, from) <<std::endl;
+    }
     const char arrC[] = " 123 ";
     char *pS = const_cast<char *>(arrC);
     std::cout << "sizeof:" << sizeof(" 123 ") << ", " << sizeof(arrC) << ", " << sizeof(pS) << std::endl;
