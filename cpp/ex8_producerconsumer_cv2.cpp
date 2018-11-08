@@ -70,7 +70,7 @@ public:
     }
     // renc, why to remove front() and pop() for multiply customers ?
     // tbb concurrent_queue does not have front() and pop() functions.
-    // https://www.threadingbuildingblocks.org/tutorial-intel-tbb-concurrent-containers
+    // https://www.threadingbuildingblocks.org/tutorial-intel-tbb-concurrent-containers 
     // https://www.justsoftwaresolutions.co.uk/threading/implementing-a-thread-safe-queue-using-condition-variables.html
     // 
     bool try_pop(T &destination) {
