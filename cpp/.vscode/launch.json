@@ -9,7 +9,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/ex8_threadinthread",
+            "program": "${workspaceFolder}/build/test2",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
