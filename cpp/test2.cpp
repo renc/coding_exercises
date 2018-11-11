@@ -7,10 +7,9 @@
 // when the client do that, it invoke the Listener to do order tracking. 
 //
 // 2. Requests and responds are asynchronous, synchronization is needed, 
-// however the test donot suggest whether synchronization is done at client before invoking these callbacks
+// however this Test donot suggest whether synchronization is done at client before invoking these callbacks
 // or synchronization should be done by derived Listener, here the second case is used.
-// 
-// 3. Part A. X, Y are not changed for one instance object. They could be different values between objects.
+//  
 // 
 
 // Result:
@@ -27,6 +26,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <queue>
+//#include <boost/lockfree/queue.hpp>
 #include <memory>
 #include <deque>
 #include <unordered_map>
@@ -150,6 +150,87 @@ public:
     int m_iOldId = -1, m_iNewId = -1; // used to link the original insert request and the replace request.
 };
 
+
+template <typename T>
+class QueueCV {
+public:
+    void push(const T& n)
+    {
+        {
+            std::lock_guard<std::mutex> lk(m_mtx);
+            m_queue.push(n);
+        } // Important, unlock before notify, otherwise, 
+        // the waiting thread wait up before the mutx is unlock.
+        m_cv.notify_all();
+        // vs notify_one() ? multiply customers.
+    }
+    // T pop() // i use this function signature before, but change to
+    // Using a reference parameter to receive the result is used to transfer ownership
+    //  out of the queue in order to avoid the exception safety issues 
+    // of returning data by-value: if the copy constructor of a by-value return throws, 
+    // then the data has been removed from the queue, but is lost, 
+    // whereas with this approach, the potentially problematic copy is performed 
+    // prior to modifying the queue (see Herb Sutter's Guru Of The Week #8 
+    // for a discussion of the issues). 
+    void pop(T &destination)
+    {
+        std::unique_lock<std::mutex> lk(m_mtx);
+        m_cv.wait(lk, [this](){ return m_queue.empty() == false;});
+        // same as
+        // while ( ! (q.empty() == false) ) 
+        //     m_cv.wait(lk);
+        //
+        // condition variables can be subject to spurious wake-ups, 
+        // so it is important to check the actual condition being waited for 
+        // when the call to wait returns.
+        // 
+        // if we are here, q is not empty and mtx is locked.
+        
+        //T iRet = m_queue.front();
+        destination = m_queue.front();
+        m_queue.pop();   
+        //return iRet;     
+        // this could be blocking (not no-blocking)
+    }
+    T& front() {
+        // why return type is reference ? 
+        // https://en.cppreference.com/w/cpp/container/queue/front
+        std::lock_guard<std::mutex> lk(m_mtx);
+        return m_queue.front();
+    } 
+    // const T& front() const {
+    //     std::lock_guard<std::mutex> lk(m_mtx);
+    //     return m_queue.front();
+    // }
+    // renc, why to remove front() and pop() for multiply customers ?
+    // tbb concurrent_queue does not have front() and pop() functions.
+    // https://www.threadingbuildingblocks.org/tutorial-intel-tbb-concurrent-containers 
+    // https://www.justsoftwaresolutions.co.uk/threading/implementing-a-thread-safe-queue-using-condition-variables.html
+    // 
+    bool try_pop(T &destination) {
+        std::lock_guard<std::mutex> lk(m_mtx);
+        if (m_queue.empty())
+            return false;
+
+        destination = m_queue.front();
+        m_queue.pop();  
+        return true;
+    }
+    bool empty()  {
+        std::lock_guard<std::mutex> lk{m_mtx};
+        return m_queue.empty();
+    }
+    int size()  {
+        std::lock_guard<std::mutex> lk{m_mtx};
+        return m_queue.size();
+    }
+private:
+    std::mutex m_mtx;
+    std::condition_variable m_cv;
+
+    std::queue<T> m_queue; // un-bound
+};
+
 class DerivedListener : public Listener
 {
 public:
@@ -178,7 +259,8 @@ private:
     
     std::thread m_thread; // thread to processMessage
     std::atomic_bool m_bStopThread{false};
-    std::queue<std::shared_ptr<BasicMsg> > m_msgQueue;
+    //std::queue<std::shared_ptr<BasicMsg> > m_msgQueue;
+    QueueCV<std::shared_ptr<BasicMsg> > m_msgQueue;
     
     std::deque<OrderInfo> m_aOrderInfo;
     std::unordered_map<int, int> m_mapOrderId2Idx; //map the order id to index of m_aOrderInfo.
@@ -187,6 +269,8 @@ private:
     std::atomic<int> m_bFinishOperationHasEnoughXRequestForLastYSecond { -1};
     std::mutex m_mtxXRequestYSecond;
     std::condition_variable m_cvXRequestYSecond;
+
+
 };
 
 DerivedListener::DerivedListener(int iXNumRequest, int iYNumSeconds) 
@@ -252,15 +336,20 @@ void DerivedListener::processMessage()
  
     while (!m_bStopThread)
     {
-        if (m_msgQueue.empty()) {
-            //std::cout << ".q0.";
+        //// std::queue
+        // if (m_msgQueue.empty()) {
+        //     //std::cout << ".q0.";
+        //     std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        // }
+        // else 
+        // {
+        //     std::shared_ptr<BasicMsg> pMsg = m_msgQueue.front();
+        //     m_msgQueue.pop(); 
+        
+        std::shared_ptr<BasicMsg> pMsg;
+        if (m_msgQueue.try_pop(pMsg)== false) {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        }
-        else 
-        {
-            std::shared_ptr<BasicMsg> pMsg = m_msgQueue.front();
-            m_msgQueue.pop();
-            
+        } else {
             if (pMsg->msgType() == MsgType::tInsertOrderRequest)
             {
                 std::shared_ptr<MsgInsertOrderRequest> pM = std::dynamic_pointer_cast<MsgInsertOrderRequest>(pMsg);
@@ -353,9 +442,10 @@ bool DerivedListener::hasEnoughXRequestsForLastYSeconds(int iXNumRequest, double
 
 int main()
 {
-        DerivedListener *pListener = (new DerivedListener(10, 2));
-        pListener->startThreadProcessMessage();
-        //std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    DerivedListener *pListener = (new DerivedListener(10, 2));
+    pListener->startThreadProcessMessage();
+    //std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    // Test for Part A.
     {
     
         for (int i = 0; i < 11; ++i)
@@ -380,6 +470,10 @@ int main()
             std::cout << "Test ok 3.\n";
         else    
             std::cout << "test fail 3.\n";
+    }
+    // Test for Part B. 
+    {
+
     }
     return 0;
 }
