@@ -9,7 +9,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/binaryheap",
+            "program": "${workspaceFolder}/build/ex8_threadinthread",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
