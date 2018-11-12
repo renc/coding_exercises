@@ -281,6 +281,7 @@ namespace ToDoWebScrape
     {
         public DateTime m_iDate = new DateTime();
         public Int32 m_iUid = -1;
+        public Int32 m_iLen = -1;
         public List<List<String>> m_rows = new List<List<string>>();
         
         public static void ReadRaceResultFromFile(SortedList<Int64, RRTable> aRaceIdToResultTable, String sFile)
@@ -328,6 +329,7 @@ namespace ToDoWebScrape
                                 lastTable = new RRTable();
                                 lastTable.m_iDate = rid.Date();
                                 lastTable.m_iUid = rid.Uid();
+                                lastTable.m_iLen = Convert.ToInt32(newColumns[19]);
                                 int a = 0;
                                 int b = a;
                                 ++b;
@@ -384,7 +386,7 @@ namespace ToDoWebScrape
                         {
                             List<String> oldColumns = table.m_rows[ir];// one row
                             List<String> newColumns = new List<String>();
-                            for (int i = 0; i < 19; ++i)
+                            for (int i = 0; i < 20; ++i)
                                 newColumns.Add(String.Empty);
                             newColumns[0] = oldColumns[0]; // finishing num
                             newColumns[1] = oldColumns[1]; // horse num
@@ -408,6 +410,7 @@ namespace ToDoWebScrape
                             newColumns[16] = ((iRunPosCount > 4 && oldColumns.Count > 16) ? oldColumns[16] : "NA"); // running position 5
                             newColumns[17] = ((iRunPosCount > 5 && oldColumns.Count > 17) ? oldColumns[17] : "NA"); // running position 6
                             newColumns[18] = RaceId.YearRaceIdToString(RaceId.YearRaceId(table.m_iDate, table.m_iUid)); // race id
+                            newColumns[19] = table.m_iLen.ToString();
 
                             writer.WriteRow(newColumns);
                         }
@@ -638,6 +641,40 @@ namespace ToDoWebScrape
                     }
                 }
             }
+            // to find out how long the path.
+            HtmlNodeCollection spanCol = htmlDoc.DocumentNode.SelectNodes("//span");
+            foreach (HtmlNode span in spanCol)
+            {
+                String sInnerText = span.InnerText;
+                String sInnerHtml = span.InnerHtml;
+                if (bChinese)
+                {
+                    if (sInnerText.Length < 50 && sInnerText.Contains("米") && sInnerText.Contains("0"))
+                    {
+                        // to find the 长度
+                        Int32 iP1 = sInnerText.LastIndexOf('米');
+                        Int32 iP0 = iP1 - 4;
+                        String sLen = sInnerText.Substring(iP0, 1);
+                        Int32 i4 = -1;
+                        try { i4 = Convert.ToInt32(sLen); }
+                        catch (OverflowException) { i4 = -1;  }
+                        catch(FormatException) { i4 = -1;  }
+                        if (i4 == -1)
+                            sLen = sInnerText.Substring(iP1 - 3, 3);
+                        else
+                            sLen = sInnerText.Substring(iP1 - 4, 4);
+                        Int32 iLen = -1;
+                        try  { iLen = Convert.ToInt32(sLen); }
+                        catch (OverflowException) { iLen = -1; }
+                        catch (FormatException) { iLen = -1; }
+                        rrTable.m_iLen = iLen;
+                        break;
+                    }
+                }
+                else
+                { // todo ?? 2018/10/19, english version  
+                }
+            }
             // //table means table in the whole doc, including inner table under a table.
             HtmlNodeCollection tableArr = htmlDoc.DocumentNode.SelectNodes("//table");
             Int32 iTableCount = tableArr.Count;
@@ -772,7 +809,7 @@ namespace ToDoWebScrape
 
         public static void Main()
         {
-            const bool bChineseVersion = false; // false: english; true: chinese. 
+            const bool bChineseVersion = true; // false: english; true: chinese. 
 
             //testWebRequest();
             if (false)
@@ -810,7 +847,7 @@ namespace ToDoWebScrape
 
             // key: 20180304, value: RacingDate 
             SortedList<Int32, RacingDate> aRacingDate = new SortedList<int, RacingDate>();
-            bool bDebugOneDate = false;// true;//
+            bool bDebugOneDate = false;//true;// 
             if (bDebugOneDate)
             {
                 // for debug, only one date, 
@@ -1051,7 +1088,7 @@ namespace ToDoWebScrape
                 RaceIdMapDatePageId.writeRowsToFile(aRaceIdMapDatePageId, sFileOfRaceIdMapDatePageId);
                 Console.WriteLine("Begin to write race results to file " + sFileOfRaceResult);
                 Int32 iRaceIdWroteCount = RRTable.WriteRaceResultToCSVFile(aRaceIdToResult, sFileOfRaceResult);
-                Console.WriteLine($@"End of writing race results to file {sFileOfRaceResult}, raceid count {iRaceIdWroteCount}.");
+                Console.WriteLine($@"End of writing race results to file {sFileOfRaceResult}, raceid count {iRaceIdWroteCount}. in loop{iTry100}.");
             } // end of  while (iTry100++ < 100)
 
             //
