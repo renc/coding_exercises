@@ -36,10 +36,6 @@
         "typeinfo": "cpp",
         "utility": "cpp",
         "cstddef": "cpp",
-        "cmath": "cpp",
-        "condition_variable": "cpp",
-        "cstring": "cpp",
-        "deque": "cpp",
-        "numeric": "cpp"
+        "climits": "cpp"
     }
 }

@@ -6,8 +6,21 @@ ex8_producerconsumer_cv2.cpp is a refactor of that version.
 Producer Consumer with std::queue 
 https://gist.github.com/iikuy/8115191 
 
-g++ filename.cpp -o exename -std=c++11 -pthread -g
--g for debug
+g++ ex8_producerconsumer_cv2.cpp -o ./build/ex8_producerconsumer_cv2 -std=c++11 -pthread -g
+, where -g for debug
+
+gdb ./build/ex8_producerconsumer_cv2
+break lineX (b lineX)  
+run 
+bt 
+continue (c)
+next (n)
+step (s) 
+print iValueYouWantToCheck                          
+quit 
+
+                                    
+                                        
 
 */ 
 #include <thread>
@@ -118,7 +131,7 @@ public:
         while(1) {
             int iN = -1;
             m_queue.pop(iN);
-            std::cout << "Consumer id: " << m_iId << ", " << iN << std::endl;
+            std::cout << "Consumer id: " << m_iId << ", " << iN << std::endl; 
         }
     }
 private:

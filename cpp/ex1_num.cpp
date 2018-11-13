@@ -1,8 +1,9 @@
 /*
 To build: 
-g++ ex1_num.cpp -o ex1_num -std=c++11 -g 
+g++ ex1_num.cpp -o ./build/ex1_num -std=c++11 -g 
 // -g is need for debug
 */ 
+#include <climits> // for CHAR_BIT 
 #include <vector>
 #include <string> 
 #include <algorithm>
@@ -33,6 +34,9 @@ std::vector<int> getDigits(int num, bool bOrder=true)
 
 int main()
 {
+    // number of bits in a byte, <climits> 
+    std::cout << CHAR_BIT << ", " << CHAR_MIN << ", " << CHAR_MAX << std::endl;
+
     std::cout << vector2string(getDigits(8973240)) << std::endl;
     std::cout << vector2string(getDigits(0)) << std::endl;
     assert( vector2string(getDigits(0)) == "0" );
