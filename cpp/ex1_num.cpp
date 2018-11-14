@@ -32,10 +32,19 @@ std::vector<int> getDigits(int num, bool bOrder=true)
     return ret;
 } 
 
+void recursiveFunc(int x)
+{   
+    x++;
+    recursiveFunc(x);
+}
+
 int main()
 {
     // number of bits in a byte, <climits> 
+    // CHAR_BIT * sizeof(T) = T's occupied bits. 
     std::cout << CHAR_BIT << ", " << CHAR_MIN << ", " << CHAR_MAX << std::endl;
+
+    recursiveFunc(0);
 
     std::cout << vector2string(getDigits(8973240)) << std::endl;
     std::cout << vector2string(getDigits(0)) << std::endl;

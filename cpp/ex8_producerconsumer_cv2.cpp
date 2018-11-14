@@ -17,7 +17,21 @@ continue (c)
 next (n)
 step (s) 
 print iValueYouWantToCheck                          
+
+
+// to remove breakpoints
+info break         // show how many breakpoints
+del #numId          // delete a breakpoints with numId
+clear filename:lineNum // delete all breakpoints on this line.
+
+// to check the threads bt
+info threads
+thread apply all bt
+thread id#
+
 quit 
+
+
 
                                     
                                         
