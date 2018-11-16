@@ -1,6 +1,6 @@
 
 1 to N,
-N could be odd and even £¿
+N could be odd and even ??
 
 1 2 3 4 5 = 15
 sum = (1 + N) * N/ 2;                  
