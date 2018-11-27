@@ -9,7 +9,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/ex8_producerconsumer_cv2",
+            "program": "${workspaceFolder}/build/dp_CoinsSelection",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
