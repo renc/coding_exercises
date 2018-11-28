@@ -2,6 +2,7 @@
 // given some coins, for example {1, 3, 5}
 // given a sum, for example sum =11, 
 // to calc the minimun number of coins used.
+// Check my local notebook for details. 
 // $ g++ ./dsal/dp_CoinsSelection.cpp  -o ./build/dp_CoinsSelection -std=c++11 -g
 
 #include <iostream>
@@ -161,6 +162,45 @@ unsigned int dp_cacheSubProblem(const std::vector<int> &coins, int iSum, std::ma
     return iMinimumNum;
 }
 
+unsigned int dp_bottomup(const std::vector<int> &coins, int iSum)
+{ 
+    
+    return 0;
+} 
+
+unsigned int dp_bottomup_v2(const std::vector<int> &coins, int iSum)
+{
+    // to use the bottom up approach to calc all the subproblems.
+    
+    std::map<int, int> dp;
+    dp[0] = 0; // introduce error dp[1] = min( 1 + dp[1-1], ... )
+    for (size_t i = 0; i < coins.size(); ++i)
+    {
+        dp[ coins[i] ] = 1; // to get dp[] only use 1 coin
+    }
+
+    for (int i = 0; i <= iSum; ++i)
+    {
+        // to calc dp[i]
+        // = min { 1+dp[i - coins[0]],  1+dp[i - coins[1]],  1+dp[i - coins[2]], ... }
+        for (size_t j = 0; j < coins.size(); ++j)
+        {
+            int temp = i - coins[j];
+            if ( temp >= 0) {
+                if (dp.find(i) != dp.end())
+                    dp[i] = std::min(dp[i], 1 + dp[temp]);
+                else
+                    dp[i] = 1+dp[temp];
+            }
+        }
+    }
+    
+    if (dp.find(iSum) == dp.end())
+        return 0;
+
+    return dp[iSum];
+}
+
 int main()
 {
     std::vector<int> coins{1, 2, 5}; // can be used replicition
@@ -221,6 +261,12 @@ int main()
     iSum = 2; 
     mapCacheDp = {};
     iCoinNum = dp_cacheSubProblem(coins, iSum, mapCacheDp);
+    std::cout << "For iSum:" << iSum << ", Coin num: " << iCoinNum << std::endl;
+    
+    std::cout << "To test the dp(+bottom up) to find optimal: \n"; 
+    coins = {1, 3, 5};
+    iSum = 11;  
+    iCoinNum = dp_bottomup_v2(coins, iSum);
     std::cout << "For iSum:" << iSum << ", Coin num: " << iCoinNum << std::endl;
     
     getchar();

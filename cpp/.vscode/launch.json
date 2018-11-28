@@ -9,7 +9,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/dp_CoinsSelection",
+            "program": "${workspaceFolder}/build/longestIncreasingSeq",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
