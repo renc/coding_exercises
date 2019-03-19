@@ -1,4 +1,4 @@
-// Test 2, answer from canjiang.ren@outlook.com 
+// Test 2 from Eclipse Trading online test, answer from xx@outlook.com 
 // First, thx for sharing this test, really interesting. 
 
 // These assumptions are made:
