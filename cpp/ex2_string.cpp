@@ -4,56 +4,35 @@
 #include <iostream>
 #include <sstream> // for std::istringstream 
 #include <assert.h>
+#include <string>
 
-char *strcpy1(char *to, const char *from) 
+#include "util/string.h"
+void readPosition(std::string s, int& r, int& c)
 {
-	if (from == NULL) return NULL;
-	if (to == from) return to;
-    std::cout <<  strlen(to) << ", " << strlen(from) << std::endl;
-    char *head = to; // how about not enough memory for to ?
-    int i = 0;
-	for (; from[i] != '\0'; ++i) // how about not nul terminated?
-		to[i] = from[i];
-    to[i] = '\0'; // forget ths ?
-    return head;
-}
-
-// function to remove all spaces.
-bool myIsSpace(char ch)
-{
-    return std::isspace(static_cast<unsigned char>(ch));
-}
-std::string removeSpace(const std::string &str)
-{
-    std::string ret{""};
-    for (auto e: str) {
-        if (!myIsSpace(e)) {
-            ret += e;
-        } 
-    }
-    return ret;
-}
-// function to count the number of words
-void getWordsFromString(const std::string &str)
-{
-    std::istringstream input;
-    input.str(str);
-    int iCount = 0; 
-    while (input)
-    {
-        std::string sWord;
-        input >> sWord;
-        if (sWord.empty() == false)
-            std::cout << iCount++ << ": " << sWord << std::endl;
-        // do not know why the last word is empty
+    int i = 0; 
+    for (; i < s.size(); ++i) {
+        if ('A' <= s[i] && s[i] <= 'Z') {
+            c = s[i] - 'A' + 1; // 'A' = 1, 'Z' = 26
+            r = std::stoi(s.substr(0, i));
+        }
     }
 }
-
 int main()
 {
     {
+        std::string cell = "13D";  int r = -1, c = -1;
+        readPosition(cell, r, c);
+        std::cout << cell << ", r=" << r << ", c=" << c << std::endl;
+    }
+    {
+        std::string cell = "3Z";  int r = -1, c = -1;
+        readPosition(cell, r, c);
+        std::cout << cell << ", r=" << r << ", c=" << c << std::endl;
+    }
+
+    {
         char to[10], from[]=" hello _";
-        std::cout << strcpy1(to, from) <<std::endl;
+        std::cout << renc::strcpy1(to, from) <<std::endl;
     }
     const char arrC[] = " 123 ";
     char *pS = const_cast<char *>(arrC);
@@ -67,8 +46,5 @@ int main()
     std::cout << "s1: " << s1.size() << " \"" << s1 << "\"\n";
     std::cout << "s2: " << s2.size() << " \"" << s2 << "\"\n";
   */
-    assert(removeSpace(" 1 2 3    \t 4 \n 5 ") == std::string("12345"));   
-
-    getWordsFromString(" how    are \t you ? ");
     return 0;
 }

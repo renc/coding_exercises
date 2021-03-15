@@ -1,8 +1,0 @@
-D:\Users\renc\Documents\GitHub\coding_exercises\dotNet\WebRequest\ToDoWebScrape\bin\Release\ToDoWebScrape.exe.config
-D:\Users\renc\Documents\GitHub\coding_exercises\dotNet\WebRequest\ToDoWebScrape\bin\Release\ToDoWebScrape.exe
-D:\Users\renc\Documents\GitHub\coding_exercises\dotNet\WebRequest\ToDoWebScrape\bin\Release\ToDoWebScrape.pdb
-D:\Users\renc\Documents\GitHub\coding_exercises\dotNet\WebRequest\ToDoWebScrape\bin\Release\HtmlAgilityPack.dll
-D:\Users\renc\Documents\GitHub\coding_exercises\dotNet\WebRequest\ToDoWebScrape\bin\Release\HtmlAgilityPack.pdb
-D:\Users\renc\Documents\GitHub\coding_exercises\dotNet\WebRequest\ToDoWebScrape\bin\Release\HtmlAgilityPack.xml
-D:\Users\renc\Documents\GitHub\coding_exercises\dotNet\WebRequest\ToDoWebScrape\obj\Release\ToDoWebScrape.exe
-D:\Users\renc\Documents\GitHub\coding_exercises\dotNet\WebRequest\ToDoWebScrape\obj\Release\ToDoWebScrape.pdb

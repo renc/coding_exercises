@@ -49,6 +49,8 @@ std::vector<int> mergeKArrays(const std::vector<std::vector<int> > &arr)
 
     // renc, it should be myself to implement the min heap, but directly use stl here.
     std::priority_queue<Element, std::vector<Element>, ElementCompare > pq;
+
+    // push the first element of each array into heap
     for (int i = 0; i < arr.size(); ++i)
     {
         if (arr[i].size()) {

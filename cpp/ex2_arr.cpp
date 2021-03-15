@@ -20,7 +20,12 @@ void testCharArr()
    std::cout << "abc[10]:" << abc[10] << std::endl;
    std::cout << "abc[12]:" << abc[12] << std::endl;
    std::cout << "ptr:" << ptr << std::endl;
-   std::cout << "&ptr:" << &ptr << std::endl;
+   std::cout << "&ptr:" << &ptr << std::endl; 
+
+   {
+       char a[4] = { 'a', 'b', 'c', 'd' };
+       std::cout << "a: sizeof " << sizeof(a) << std::endl;
+   }
 }
 
 int main(int argc, char *argv[])

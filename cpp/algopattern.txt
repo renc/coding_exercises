@@ -1,0 +1,51 @@
+std::vector<int>::iterator iMaxIterator = std::max_element(a.begin(), a.end());
+int sum = std::accumulate(v.begin(), v.end(), 0); // <numeric>
+int iMin = std::numeric_limits<int>::max(); // <limits> which include <climits>  
+double pow(double, double); or std::pow() // <cmath>
+std::abs(x); // <cmath>
+
+//-
+void print(const std::vector<int> &arr) {
+    for (auto e: arr) { std::cout << e << ", "; }
+    std::cout << std::endl;
+}
+std::vector<int> toBinary(int N) 
+{
+    std::vector<int> result;
+    if (N == 0) result.push_back(0); 
+    else {
+        while (N > 0) {
+            if (N % 2 == 1) result.push_back(1);
+            else result.push_back(0);
+            N /= 2; 
+        }
+    }
+    std::reverse(result.begin(), result.end());
+    return result; 
+}
+
+
+
+
+// -- min abs sum of array. 
+#include <vector> 
+#include <limits>
+#include <cmath> 
+
+int iMin = std::numeric_limits<int>::max();
+
+void btHelper(const std::vector<int> &a, int iPrevSum, int s) 
+{
+    if (s == a.size() -1 ) { 
+        iMin = std::min(iMin, std::abs(iPrevSum + a[s]) );// *1
+        iMin = std::min(iMin, std::abs(iPrevSum - a[s]) ); // *-1
+    } else {
+        btHelper(a, iPrevSum + a[s], s+1);// *1
+        btHelper(a, iPrevSum - a[s], s+1); // *-1
+    }
+} // ok, but performance fail. 
+int solution(vector<int> &A) {
+    // write your code in C++14 (g++ 6.2.0)
+    btHelper(A, 0, 0);
+    return iMin;
+}
