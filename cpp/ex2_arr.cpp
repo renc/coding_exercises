@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <string.h> // for strcpy
+#include <vector>
+
 
 void testCharArr()
 {
@@ -28,9 +30,42 @@ void testCharArr()
    }
 }
 
+namespace test6 {
+    struct A {
+        int _i;
+        ~A() { std::cout << _i << std::endl; }
+    };
+}
+namespace test7 {
+    class A {
+    private: 
+        int data;
+    public:
+        A() : data{ 0 } {}
+        A(const A&) = delete;
+        A& operator=(const A&) = delete;
+    };
+}
 int main(int argc, char *argv[])
 {
-    testCharArr();
+    //testCharArr();
 
+    {
+        //auto a = new A[3]{ {0}, {1}, {2} };
+        //delete a;
+        //delete[] a;
+    }
+    {
+        // test7
+        //std::vector<test7::A> aVec;
+        //aVec.resize(5);// do not compile
+    }
+
+    {
+        unsigned i = 1;
+        auto l = [i](int j) { i -= j;  };
+        l(2);
+        std::cout << i << std::endl;
+    }
     return 0; // exist status, 0 success. 
 }
