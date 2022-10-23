@@ -1,8 +1,8 @@
 
 /* 
-
-
+https://eli.thegreenplace.net/2014/variadic-templates-in-c/
 http://www.cs.rpi.edu/~musser/design/blitz/meta-art.html
+https://github.com/elliotgoodrich/VariadicTemplateAlgorithms/blob/master/include/vta/algorithms.hpp 
 
 */ 
 
@@ -18,7 +18,92 @@ http://www.cs.rpi.edu/~musser/design/blitz/meta-art.html
 #include <deque>
 
 namespace meta {
+    
+    // -----------------------
+    // logical and
+    // 
+    // 1. this primary template must be the first one, or the others will get:
+    //  error: explicit specialization of undeclared template struct 'is_all' 
+    // 2. this primary template is only declare, not defined. why
+    // if there is no other explicit specialization, this is called, wo definiation, compile error.
+    template <bool ... Bs>
+    struct is_all; 
+    
+    // 3. these coming two specialization can be in any order.
+    template <>
+    struct is_all<> : std::true_type {};
 
+    template <bool B, bool... Bs> 
+    struct is_all<B, Bs...> : std::bool_constant< B&& is_all<Bs...>::value > 
+    {};
+                
+    // 4. no need even it is not error, since parameter pack (bool... Bs) can be zero lenth
+    //template <bool B>
+    //struct is_all<B> : std::true_type {};
+    //
+    // 5. 
+    // using cpp17 flod expression, no recursion !!
+    template <bool ... Bs>
+    using is_all_c17 = std::bool_constant< (Bs && ... && true) >;
+    // ----------------------------
+    // logical OR 
+    // 
+    template <bool ... Bs>
+    using is_any = std::bool_constant<
+        !is_all<!Bs...>::value >; 
+
+    template<int ... Is>
+    using is_all_even = is_all< (Is % 2 == 0) ... >; 
+
+    // c++11, c++14
+    template<typename R, bool...Bs>
+    using enable_if_any =
+        std::enable_if< is_any<Bs>::value..., R >; 
+
+    template<typename R, bool...Bs>
+    using enable_if_all =
+        std::enable_if< is_all<Bs>::value..., R >; 
+    // c++17 flod expression 
+    template<typename T, bool...Bs>
+    using enable_if_any_c17 =
+        std::enable_if< (Bs || ...), T >;
+
+    template<typename T, bool...Bs>
+    using enable_if_all_c17 =
+        std::enable_if< (Bs && ...), T >;
+
+
+
+    // variadic templates (variadic function templates) (cpp11, using recursion) 
+    bool isAllTrue() { return true; } // basic and default value.
+    template <typename T, typename ... Ts>
+    bool isAllTrue(T t, Ts ... ts) { return t && isAllTrue(ts); } // using recursion 
+
+    template <typename  ... Args >
+    constexpr bool isAll(Args... args) { return (true && ...&& args); } // true is the first init value
+    // cpp17 Flod expression, all with default value. this simply the cpp11 which require recursion. 
+
+    // homogeneous vs. heterogeneous 
+
+    void test_isAll() {
+        isAll(); // this mean variadic template can support zero argument. 
+        static_assert( isAll() ); // this will error if remove the constexpr from isAll.
+        static_assert( isAll(true) );
+        static_assert( isAll(false) == false );
+        static_assert(isAll(true, true, 3));
+        static_assert(isAll(true, true, 0) == false);
+
+        static_assert(is_all<true, true>::value);
+        static_assert(is_all_even<0, 2, 32>::value);
+
+        static_assert(is_all_c17<true, true >::value);
+        static_assert(is_all_c17< >::value);
+    }
+
+    
+    
+    // the template parameter is not type, it is value.
+    // during the recursion, the value discrese.
     template <int n> 
     struct Square { static constexpr int value = n * n;  };
 
@@ -94,6 +179,12 @@ namespace meta {
         }
     }
 
+    // returns the size of the parameter pack as an integer
+    template <typename ... Types>
+    constexpr int countSizeof(Types && ...) noexcept { return sizeof ... (Types); } // count how many types.
+    
+    
+     
     // class template as template parameters
     template <  
         typename Element,
@@ -182,7 +273,7 @@ namespace meta {
         for (const T& v : container)
             std::cout << v << ", ";
         std::endl;
-    }
+    } // 
 
     template <typename First, typename ... Args>
     void print(const First& firstarg, const Args&... args) {
@@ -203,77 +294,97 @@ namespace meta {
         std::cout << "\n"; 
     } // it turns out: outWithSpace(arg1), outWithSpace(arg2), outWithSpace(arg3), and the others
 
-    namespace variadic {
-        // variadic templates (variadic class templates) 
-        template <typename... T>
-        struct Tuple { }; // basic (empty) tuple, i.e. Tuple<> object;
-        template <typename T, typename ...Ts>
-        struct Tuple<T, Ts...> {
-            T first;
-            Ts rest;
-            Tuple(const T& f, const Ts& ... r) : first(f), rest(r...) {}
-        };
-        void testTuple() {
-            Tuple<> t0;
-            Tuple<bool> t1(false);
-            Tuple<int, char, std::string> t2(1, 'a', "ABC");
-        }
-
-        // variadic templates (variadic function templates) (cpp11, using recursion) 
-        bool isAllTrue() { return true;  } // basic and default value.
-        template <typename T, typename ... Ts> 
-        bool isAllTrue(T t, Ts ... ts) { return t && isAllTrue(ts); } // using recursion 
-
-        template <typename  ... Args >
-        constexpr bool isAll(Args... args) { return ( true && ...&& args); } 
-        // cpp17 Flod expression, all with default value. this simply the cpp11 which require recursion. 
-
-        void test_isAll() {
-            isAll(); // this mean variadic template can support zero argument. 
-            static_assert(isAll()); // this will error if remove the constexpr from isAll.
-            isAll(true);
-            isAll(false);
-            isAll(true, true);
-        }
+    
+    // variadic templates (variadic class templates) 
+    template <typename... T>
+    struct Tuple { }; // basic (empty) tuple, i.e. Tuple<> object;
+    template <typename T, typename ...Ts>
+    struct Tuple<T, Ts...> {
+        T first;
+        Ts rest;
+        Tuple(const T& f, const Ts& ... r) : first(f), rest(r...) {}
+    };
+    void testTuple() {
+        Tuple<> t0;
+        Tuple<bool> t1(false);
+        Tuple<int, char, std::string> t2(1, 'a', "ABC");
+    }
+    
 
         
-        template <typename H, typename ... Ts>
-        auto add(H head, Ts ... tail) { return head + add(tail...); } // recursion 
-        template <typename H> auto add(H head) { return head;  }
-        // at cpp17, with fold expressions
-        template <typename H, typename ... Ts> 
-        auto add2(H head, Ts ... tail) { return (head + ... + tail);  }
-        // expands to: head + tail[0] + tail[1] + ... 
+    template <typename H, typename ... Ts>
+    auto add(H head, Ts ... tail) { return head + add(tail...); } // recursion 
+    template <typename H> 
+    auto add(H head) { return head;  } // recursion need a basic case to stop
+    // at cpp17, with fold expressions
+    template <typename H, typename ... Ts> 
+    auto add2(H head, Ts ... tail) { return (head + ... + tail);  }
+    // expands to: head + tail[0] + tail[1] + ... 
         
-        //template <typename ...Args> auto sum(Args ... args) { return (args + ...); } // this does not have value for sum();
-        template <typename ...Args> auto sum(Args ... args) { return (args + ... + 0); } // init value, support sum()
+    //template <typename ...Args> auto sum(Args ... args) { return (args + ...); } // this does not have value for sum();
+    template <typename ...Args> 
+    auto sum(Args ... args) { return (args + ... + 0); } // init value 0 is the last one, support sum()
         
-        // // https://foonathan.net/2020/05/fold-tricks // 
-        // 
-        // call a function with each element 
-        // for (auto elem : ts) f(elem);  
-        // ( f(ts), ... ); 
-        // 
-        // call a function with each element until a predicate matches
-        // for (auto elem : ts) {
-        //   if (pred(elem)) break;
-        //   f(elem);
-        // } 
-        // ( (pred(ts) ? false : (f(ts), true) ) && ... ); 
-        // expands to (pred(ts[0]) ? false : (f(ts[0], true))
-        //         && (pred(ts[1]) ? false : (f(ts[1], true)) && ... 
+    // // https://foonathan.net/2020/05/fold-tricks // 
+    // 
+    // call a function with each element 
+    // for (auto elem : ts) f(elem);  
+    // ( f(ts), ... ); 
+    // 
+    // call a function with each element until a predicate matches
+    // for (auto elem : ts) {
+    //   if (pred(elem)) break;
+    //   f(elem);
+    // } 
+    // ( (pred(ts) ? false : (f(ts), true) ) && ... ); 
+    // expands to (pred(ts[0]) ? false : (f(ts[0], true))
+    //         && (pred(ts[1]) ? false : (f(ts[1], true)) && ... 
 
-        // check whether passed types are homogeneous
-        template< typename T1, typename... TN>
-        struct IsHomogeneous {
-            static constexpr bool value = (std::is_same_v<T1, TN> && ...);
-        };
-        // check whether passed arguments have the same type
-        template<typename T1, typename ...TN>
-        constexpr bool isHomogeneous(T1, TN...) {
-            return (std::is_same_v<T1, TN> && ...);
-        }
-    } // namespace variadic 
+    // check whether passed types are homogeneous (same)
+    template< typename T1, typename... TN>
+    struct IsHomogeneous {
+        static constexpr bool value = (std::is_same_v<T1, TN> && ...);
+    };
+    // check whether passed arguments have the same type
+    template<typename T1, typename ...TN>
+    constexpr bool isHomogeneous(T1, TN...) {
+        return (std::is_same_v<T1, TN> && ...);
+    }
+
+    template <int ... Ns> 
+    struct are_unique_ints;  // primary template 
+
+    template <> 
+    struct are_unique_ints<> { static bool constexpr value = true;  };
+
+    template <int N>
+    struct are_unique_ints<N> { static bool constexpr value = true; };
+
+    template <int M, int N, int ... Ns>
+    struct are_unique_ints<M, N, Ns...> {
+        static bool constexpr value = (M != N)
+            && are_unique_ints<M, Ns...>
+            && are_unique_ints<N, Ns...>;  
+    };
+
+    template <typename ... Ts>
+    struct are_unique;
+
+    template <>
+    struct are_unique<> { static bool constexpr value = true; };
+
+    template <typename T>
+    struct are_unique <T> { static bool constexpr value = true; };
+
+    template <typename T1, typename T2, typename ... Ts>
+    struct are_unique <T1, T2, Ts ...> { 
+        static bool constexpr value = !std::is_same<T1, T2>::value
+            && are_unique<T1, Ts>
+            && are_unique<T2, Ts>; 
+    };
+
+
+
     namespace ctv {
         // compile time value list from book <C++ template> version2.
         template<typename T, T ... Values>
@@ -291,7 +402,7 @@ namespace meta {
         template <typename T, T Value>
         struct CTValue {
             static constexpr T value = Value;
-        };
+        }; // make the value as a type. 
 
         template <typename List> struct FrontT;
         // compile error without this, the following FrontT<ValueList > error: 

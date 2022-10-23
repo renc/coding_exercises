@@ -1,0 +1,22 @@
+CRB {
+
+  MarketData {
+    ServerList{Server0,Server1}
+    Server0 {
+        Host{192.168.0.1} 
+        Port{9999} 
+    } 
+    Server1 {
+        Host{192.168.0.2} 
+        Port{9999} 
+    } 
+  }
+
+}
+
+keyLong{8589934588}
+keyFloat{2.0}
+keyDouble{3.2}
+keyChar{D}
+keyStr{mystr}
+
