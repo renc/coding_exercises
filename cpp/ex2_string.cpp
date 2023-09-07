@@ -46,5 +46,22 @@ int main()
     std::cout << "s1: " << s1.size() << " \"" << s1 << "\"\n";
     std::cout << "s2: " << s2.size() << " \"" << s2 << "\"\n";
   */
+
+     const char* cp = "hello";
+    
+    const char ca[] = "hello";
+    std::cout << "strlen(ca)=" << std::strlen(ca) << ", "<< std::char_traits<char>::length(ca) << std::endl;
+    char ca2[10]={'0'};
+    memset(ca2, 'a', 9); std::cout << "ca2=" << ca2 << std::endl;
+    {
+        char *cptr = new char [10];
+        std::memset(cptr, 'A', 10); std::cout << "cptr=" << cptr << std::endl;
+        delete[] cptr;
+    }
+    {
+        auto cpt2 = std::make_unique<char[]>(10);
+        std::memset(cpt2.get(), 'B', 10);std::cout << "cpt2=" << cpt2 << std::endl;
+    }
+
     return 0;
 }

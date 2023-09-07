@@ -17,11 +17,12 @@ https://github.com/elliotgoodrich/VariadicTemplateAlgorithms/blob/master/include
 #include <list>
 #include <deque>
 
-
+// // std::integral_constant, std::false_type, std::true_type, std::is_same_v
 namespace c11 {
     template <typename ...>
     using void_t = void;
 }
+// std::void_t is from c++17
 
 // primary template
 template<typename, typename = void>
@@ -30,6 +31,23 @@ struct has_type_member : std::false_type {};
 template<typename T>
 struct has_type_member<T, std::void_t<typename T::type>> : std::true_type {};
 
+// C++11 SFINAE version , https://jguegant.github.io/blogs/tech/images/SFINAE-compile-time-introspection.pdf
+template <typename T> struct has_foo11 {
+    template <typename C>
+    static constexpr decltype(std::declval<C>().foo(), bool()) test(int )
+    {
+        // we can return values, thanks to constexpr instead of playing with sizeof 
+        return true;
+    }
+
+    template <typename C>
+    static constexpr bool test(...) { return false; }
+
+    // int is used to give the precedence !
+    static constexpr bool value = test<T>(int());
+}; 
+
+// C++17 version 
 // primary template 
 template <typename T, typename = void>
 struct has_foo : std::false_type {};
@@ -69,6 +87,14 @@ void test_has()
     static_assert(has_foo<ClassZ>::value == false);
     static_assert(has_foo<ClassZ1<int>>::value == false);
 
+    static_assert(has_foo11<int>::value == false);
+    static_assert(has_foo11<std::vector<int>>::value == false);
+    static_assert(has_foo11<ClassX>::value == true);
+    static_assert(has_foo11<ClassY>::value == true);// didn't check the return type.
+    static_assert(has_foo11<ClassZ>::value == false);
+    static_assert(has_foo11<ClassZ1<int>>::value == false);
+
+    decltype(std::declval<ClassY>().foo()) a = 20;
 }
 
 // primary template 

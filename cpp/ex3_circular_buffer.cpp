@@ -1,5 +1,5 @@
-// https://accu.org/index.php/journals/389#ftn.d0e82
-// https://accu.org/index.php/journals/383 
+// https://accu.org/index.php/journals/389#ftn.d0e82   STL-style circular buffers by example part 1, 2002, did not think about threads,
+// https://accu.org/index.php/journals/383            part 2. 
 // http://goodliffe.blogspot.com/2008/11/c-stl-like-circular-buffer-part-10.html
 // https://codereview.stackexchange.com/questions/208293/ring-buffer-implementation-in-c14
 // try to implement one version without iterator first, and second version with iterator.
@@ -27,12 +27,8 @@ public:
     }
     size_t size() const { return contents_size_;}
     bool empty() const { return contents_size_ == 0; }
-    value_type top() const {
-        return array_[head_];
-    }
-    void pop_front() {
-        increment_head();
-    }
+    value_type top() const {  return array_[head_];   }
+    void pop_front() { increment_head();     }
     void push_back(const value_type &item) {
         if (contents_size_ == 0) {
             array_[head_] = item; 
@@ -54,9 +50,7 @@ public:
     const_reference front() { return array_[head_]; }
     reference back() { return array_[tail]; }
     const_reference back() { return array_[tail]; }
-    void clear() {
-        head_ = tail_ = contents_size_ = 0; 
-    }
+    void clear() {      head_ = tail_ = contents_size_ = 0;      }  // no memory operation 
     reference operator[](size_t i);
     const_reference operator[](size_t i) const;
 private:
@@ -72,7 +66,7 @@ private:
     }
     T   *array_; // why use dynamic array, not std::vector<T> ?
     size_type  array_size_;
-    size_t  head_;
-    size_t  tail_;
+    size_t  head_; // read pos 
+    size_t  tail_; // write pos 
     size_type  contents_size_;
 };
