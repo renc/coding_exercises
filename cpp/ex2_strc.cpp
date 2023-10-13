@@ -1,6 +1,7 @@
 #include <array>
 #include <type_traits>
 #include <iostream>
+#include <cstdint> // for std::uint32_t 
 
 // compile time string 
 

@@ -30,7 +30,7 @@ class LockFreeQueue {
         if (size_.load() == N) return false; // full , this is sequencial consistent memory order
         buffer_[write_pos_] = std::forward<decltype(t)>(t);
         write_pos_ = (write_pos_ + 1) % N;
-        size_.fetch_add(1); // size_.store(size_ + 1); ok ?
+        size_.fetch_add(1); // size_.store(size_ + 1); ok ? do the actually writting ahead
     }
 public:
     // write thread
@@ -43,7 +43,7 @@ public:
         {
             val = std::move(buffer_[read_pos_]); // renc: no need of that elem in the buf 
             read_pos_ = (read_pos_+1)%N;
-            size_t.fetch_sub(1);
+            size_t.fetch_sub(1); // do the actually reading ahead.
         }
         return val; 
     }
