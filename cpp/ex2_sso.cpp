@@ -1,22 +1,25 @@
 #include <iostream>
 #include <string>
 #include <cstdlib> // malloc
-// small string optimization 
+// small string optimization , sso, small object optimization 
 
 void printSize(const std::string& s)
 {
     std::cout << "s=[" << s << "], cap=" << s.capacity() << ", len=" << s.length() << ", sizeof=" << sizeof(s) << std::endl;
 }
 
-// override the global operator new
+// override the global operator new, so we can log.
 void* operator new(std::size_t sz)
 {
     void *ptr = malloc(sz);
     if (!ptr)
         throw std::bad_alloc(); 
-    std::cout << "op new sz=" << sz << ", ptr=" << ptr << "\n";
+    std::cout << "op new sz=" << sz << ", ptr=" << ptr << "\n"; // this log when need heap allocation
     return ptr;
 }
+void operator delete(void *p) noexcept {
+    return std::free(p); 
+} // new/delete goes together
 
 int main(int argc, char* argv[])
 {
@@ -33,7 +36,7 @@ int main(int argc, char* argv[])
     return 0;
 }
 /*
-g++ ex2_sso.cpp -o ex2_sso; ./ex2_sso 
+g++ ex2_sso.cpp -o ex2_sso; /tmp/ex2_sso 
 
 2023/8/30
 when len=0 for emptry string, cap is the _S_local_capacity for the local buf

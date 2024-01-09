@@ -2,6 +2,7 @@
 #include <memory> // for 
 #include <vector> // when vector reallocat, it is not ask size1, but duplicate 1, 2, 4, 8, 16, ...
 #include <list> // when list allocate, it ask for sz=1, 1, 1, ....
+#include <set> // for test
 #include <array>
 #include <limits> // for std::limit_numeric
 #include <numeric> // for std::accumulate
@@ -10,6 +11,8 @@
 #include <iomanip>
 #include <iostream>
 #include <string_view>
+#include <cstddef> // std::byte
+#include <memory_resource> // std::pmr
 
 namespace wwh {
 // /home/renc/ws/wwhrt-bookbuilder-workshop/Allocator.h
@@ -49,7 +52,7 @@ bool operator!=(const Allocator<T>&, const Allocator<U>&) {
 
 namespace cppref {
 // https://en.cppreference.com/w/cpp/named_req/Allocator
-// in book C++ high performance by Bjorn,, this is called stateless allocator
+// This is also mentioned in book C++ high performance by Bjorn,, this is called stateless allocator
 template<class T>
 struct Mallocator
 {
@@ -72,7 +75,7 @@ struct Mallocator
         }
  
         throw std::bad_alloc();
-    }
+    } // i think this is similar to the above version using ::operation new, because new do malloc and bad_alloc too.
  
     void deallocate(T* p, std::size_t n) noexcept
     {
@@ -99,7 +102,7 @@ bool operator!=(const Mallocator <T>&, const Mallocator <U>&) { return false; }
 #include <cstdint> // std::uintptr_t 
 namespace cpphp {
 // from chapter 7, C++ High Performance by Bjorn ...
-// arena == memory pool 
+// arena == memory pool , continues memory
 template <size_t N>
 class Arena {
     static constexpr size_t alignment = alignof(std::max_align_t);
@@ -140,6 +143,66 @@ template <size_t N>
 auto Arena<N>::deallocate(std::byte* p, size_t n) noexcept -> void
 {
     
+}
+// page 228, using the Arena to build a custom allocator (a stateful allocator vs stateless allocator Mallocator)
+// this is important class, which bind the arena with allocator which can be used in container. 
+template <typename T, size_t N>
+struct ShortAlloc {
+    using value_type = T;
+    using arena_type = Arena<N>; // ok, we know Arena is about N size, without knowning type T. 
+    ShortAlloc(const ShortAlloc&) = default;
+    ShortAlloc& operator=(const ShortAlloc&) = default;
+    ShortAlloc(arena_type& arena) noexcept : arena_{&arena} {} // ctro, need input of arena_type, is it better to create it inside wo relay on input from outside? like abm:: did
+    
+    template <typename U>
+    ShortAlloc(const ShortAlloc<U, N>& other) noexcept : arena_{other.arena_} {} 
+    template <typename U> struct rebind { using other = ShortAlloc<U, N>; };
+
+    auto allocate(size_t n) -> T* { return reinterpret_cast<T*>(arena_->allocate(n*sizeof(T))); }
+    auto deallocate(T* p, size_t n) noexcept -> void { arena_->deallocate(reinterpret_cast<std::byte*>(p), n*sizeof(T)); }
+
+    template <class U, size_t M>
+    auto operator==(const ShortAlloc<U, M>& other) const noexcept { return N == M && arena_ == other.arena_; }
+    template <class U, size_t M>
+    auto operator!=(const ShortAlloc<U, M>& other) const noexcept { return !(*this == other); }
+    
+    template <class U, size_t M> friend struct ShortAlloc;
+private:
+    arena_type* arena_;
+}; // end ShortAlloc
+void testShortAlloc()
+{
+    using SmallSet = ::std::set<int, std::less<int>, ShortAlloc<int, 512>>;
+
+    auto stack_arena = std::set<int, std::less<int>, ShortAlloc<int, 512>>::allocator_type::arena_type{};
+    auto unique_numbers = SmallSet{stack_arena};
+
+    // read num from stdin
+    auto n = int{};
+    while (::std::cin >> n) unique_numbers.insert(n); 
+
+    for (const auto& num : unique_numbers)
+        ::std::cout << num << "\n";
+}
+// issue is for function: void funcX(std::set<int, std::less<int>& aa) {}; // we cannot pass our SmallSet into this func, because the allocator becomes a part of the type
+// This problem of ending up with different types when using different allocators was addressed in C++17 by introducing an extra layer, which is std::pmr::polymorphic_allocator.
+// Memory resources:
+//  std::pmr::monotonic_buffer_resource , similar to our Arena class, for short lifetime objects.
+//  std::pmr::unsynchronized_pool_resource, 
+//  std::pmr::synchronized_pool_resource 
+//  page 234, class CustomMemoryResource : public std::pmr::memory_resource {}; 
+void testPmr()
+{
+    // similar to testShortAlloc()
+    auto buffer = ::std::array<::std::byte, 512>{}; // similar to our stack Aeran 
+    auto resource = ::std::pmr::monotonic_buffer_resource{buffer.data(), buffer.size(), ::std::pmr::new_delete_resource()};
+
+    auto unique_numbers = ::std::pmr::set<int>{&resource};
+
+    auto n = int{};
+    while (::std::cin >> n) { unique_numbers.insert(n); }
+
+    for (const auto& num : unique_numbers) { ::std::cout << num << "\n"; }
 }
 } // end of cpphp 
 

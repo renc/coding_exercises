@@ -52,6 +52,47 @@ public:
 }; 
 } // end of namespace cpphp 
 
+namespace timur {
+// ACCC 2017 lock-free programming modern c++
+template <typename T, size_t size>
+class LockFreeQueue
+{
+public:
+    bool push(const T& newElement)
+    {
+        auto oldWritePos = writePos.load(); 
+        auto newWritePos = getPositionAfter(oldWritePos);
+        if (newWritePos == readPos.load())
+            return false; // full. 
+        
+        ringBuffer[oldWritePos] = newElement;
+        // only write thread is updating the writePos
+        writePos.store(getPositionAfter(oldWritePos));
+        return false;
+    }
+    bool pop(T& returnedElement)
+    {
+        auto oldWritePos = writePos.load();
+        auto oldReadPos = readPos.load();
+        if (oldWritePos == oldReadPos)
+            return false; // empty
+        // only read thread is updating the readPos 
+        returnedElement = std::move(ringBuffer[oldReadPos]);
+        readPos.store(getPositionAfter(oldReadPos));
+        return true;
+    }
+private:
+  static constexpr size_t getPositionAfter(size_t pos) noexcept
+  {
+      return ++pos == rightBufferSize ? 0 : pos;
+  }
+    static_constexpr size_t ringBufferSize = size + 1; // one extra for diff full (w+1==r) from empty (r==w);
+    std::array<T, ringBufferSize> ringBuffer;
+    std::atomic<size_t> readPos = {0}, writePos = {0};
+};
+
+} // end of namespace timer
+
 namespace kjel {
 // renc: // write pos : point to last element +1.  read pos: point to the current elem can be read.
 // renc: this implementation use sequential consistent memory order

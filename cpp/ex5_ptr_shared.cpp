@@ -1,7 +1,8 @@
 #include <iostream>
 #include <string>
+// there is another implement /home/renc/repo/hands-on-design-patterns-with-cpp/Chapter06/smartptr.C , type erase erasing
 
-// custom shared_ptr 
+// custom shared_ptr , this version does not consider the Deleter as template parameter
 template <typename T>
 class shptr
 {
@@ -113,9 +114,18 @@ int main ()
         std::cout << "name=" << pS1->m_name << std::endl;
         std::cout << "name=" << (*pS1).m_name << std::endl;
     }
+    if (0) {
+        std::cout << "T5: \n";
+
+    }
     return 0; 
 }
 
 /*
 ~/ws/coding_exercises/cpp$ rm ex5_shptr; clear; g++ -o ex5_shptr ex5_shptr.cpp ; ./ex5_shptr
+
+// ----------
+how about the deleter of shared_ptr which use a second func parameter, 
+different from deleter of unique_ptr which use a second template parameter
+
 */
