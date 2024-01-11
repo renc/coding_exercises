@@ -1,5 +1,7 @@
 #include <memory> 
 #include <iostream> 
+// 2024/01 before reading this implement, please check type erase first (in hands-on-design-patterns-with-cpp/Chapter06/smartptr.C)
+// 2023/11 ref: 2022 C++ Software Design Principles and Patterns , Guildline 32, std::function, std::any, std::shared_ptr  
 
 namespace cw {
 // C++ Weekly - Ep 333 - A Simplified std::function Implementation
@@ -34,7 +36,6 @@ struct function<Ret (Param ... )>
     std::unique_ptr<callable_interface> m_actual_callable; // renc, dynamic memory, (law latency no)
 };
 
-
 // a more generic, not limit to function pointer say int (int, int) , to support lambda 
 namespace v2 {
 template <typename T>
@@ -68,6 +69,23 @@ struct function<Ret (Param ... )>
 } // end of namespace v2;
 
 int f(int x, int y) { return x+y; }
+
+void test()
+{
+    
+    //function<int (int, int)> func;
+    //func(1, 2);  // error: undefined reference to `cj::function<int (int, int)>::operator()(int, int)' 
+
+    function<int (int, int)> func{f};
+    std::cout << func(1, 2) <<"\n";
+
+    v2::function<int (int, int)> func2{[z=1](int x, int y) { return x+y+z; }};
+    std::cout << func(1, 2) + func2(3, 4) << "\n";
+
+    v2::function<bool (int)> func3{[](int x) { return (bool)x; }};
+    std::cout << func3(0) << " and " << func3(2) << "\n";
+}
+}
 
 namespace ms {
 namespace part1 {
@@ -112,29 +130,11 @@ struct function
 namespace part2 {
 // https://devblogs.microsoft.com/oldnewthing/20200514-00/?p=103749    how to optimize small memory 
 } // end of namespace part2 
-}
+} // end namespace ms
 
-void test()
-{
-    
-    //function<int (int, int)> func;
-    //func(1, 2);  // error: undefined reference to `cj::function<int (int, int)>::operator()(int, int)' 
-
-    function<int (int, int)> func{f};
-    std::cout << func(1, 2) <<"\n";
-
-    v2::function<int (int, int)> func2{[z=1](int x, int y) { return x+y+z; }};
-    std::cout << func(1, 2) + func2(3, 4) << "\n";
-
-    v2::function<bool (int)> func3{[](int x) { return (bool)x; }};
-    std::cout << func3(0) << " and " << func3(2) << "\n";
-}
-}
 
 int main()
 {
     cw::test();
     return 0; 
 }
-
-// 2023/11  ref: 2022 C++ Software Design Principles and Patterns , Guildline 32, std::function, std::any, std::shared_ptr  

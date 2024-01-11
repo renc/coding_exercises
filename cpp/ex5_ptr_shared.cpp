@@ -1,7 +1,11 @@
+// first learn how to implement a simple shared_ptr with reference couting but without considering the deleter
+// then there is another implement /home/renc/repo/hands-on-design-patterns-with-cpp/Chapter06/smartptr.C , which use type erase erasing to hind the deleter
+//
+// after u know about type erase, then go to ex5_function.cpp which use type erase too.
+
+
 #include <iostream>
 #include <string>
-// there is another implement /home/renc/repo/hands-on-design-patterns-with-cpp/Chapter06/smartptr.C , type erase erasing
-
 // custom shared_ptr , this version does not consider the Deleter as template parameter
 template <typename T>
 class shptr

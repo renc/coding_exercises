@@ -102,7 +102,13 @@ bool operator!=(const Mallocator <T>&, const Mallocator <U>&) { return false; }
 #include <cstdint> // std::uintptr_t 
 namespace cpphp {
 // from chapter 7, C++ High Performance by Bjorn ...
-// arena == memory pool , continues memory
+// a nwe expression involves two things: allocation and construction. 
+// allocation:  operator new allocate memory, u can overload it globally or per class to customize dynamic memory management. this normally return void*
+//              for container allocator, it is still how to get memory. this normally return reinterpret_cast<T*>(void * from above );
+// construction: this is about construct an object in an already allocated memory area, which is where placement new can be used. 
+
+
+// arena == memory pool , or memory resource, continues memory
 template <size_t N>
 class Arena {
     static constexpr size_t alignment = alignof(std::max_align_t);
@@ -144,6 +150,22 @@ auto Arena<N>::deallocate(std::byte* p, size_t n) noexcept -> void
 {
     
 }
+// page , before using this Arena for container+customer allocator, this Arena can be used with placement new
+
+auto user_arena = Arena<1024> {}; // only size as template parameter
+
+class User {
+public:
+    auto operator new(size_t size) -> void* { return user_arena.allocate(size); }
+    auto operator delete(void* p) -> void { user_arena.deallocate(static_cast<std::byte*>(p), sizeof(User)); }
+    auto operator new[](size_t size) -> void* { return user_arena.allocate(size); }
+    auto operator delete[](void* p, size_t size) -> void { user_arena.deallocate(static_cast<std::byte*>(p), size); }
+    
+private:
+    int id_{};
+};
+
+
 // page 228, using the Arena to build a custom allocator (a stateful allocator vs stateless allocator Mallocator)
 // this is important class, which bind the arena with allocator which can be used in container. 
 template <typename T, size_t N>
