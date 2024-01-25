@@ -17,7 +17,17 @@
 
 namespace cpphp {
 // from book 2020 C++ high performance by Bjorn Andrist ... page 378
-
+// [-][-][-][-]  init four empty slots
+// r/w    size=0
+// [*][-][-][-], after 1 push
+// r   w    size=1
+// [-][-][-][-], after 1 pop
+//    r/w   size=0 
+// [-][*][*][*], after 3 push
+//  w  r    size=3 
+// [*][*][*][*], after 1 push
+//    r/w   size=4 full, cann't push/write again 
+// as we can see, empty/full are r==w, so it need a size variable to diff
 template <class T, size_t N>
 class LockFreeQueue {
     std::array<T, N> buffer_{};   // used by both threads
@@ -46,14 +56,27 @@ public:
             size_t.fetch_sub(1); // do the actually reading ahead.
         }
         return val; 
-    }
+    } // size_ .fetch_add/fetch_sub/load func use the default memory order(std::memory_order_seq_cst), 
+    // it is too complex for me to use other memory order explicitly, so let me stick with the sequentially consistent
+
     // both threads can call this
     auto size() const noexcept { return size_.load(); }
 }; 
 } // end of namespace cpphp 
 
 namespace timur {
-// ACCC 2017 lock-free programming modern c++
+// ACCC 2017 lock-free programming modern c++ from Timur Doumler who works on audio processing
+// [-][-][-][-]  init four empty slots
+// r/w     
+// [*][-][-][-], after 1 push
+// r   w    size=1
+// [-][-][-][-], after 1 pop
+//    r/w   size=0 
+// [-][*][*][*], after 3 push
+//  w  r    size=3 
+// [-][*][*][*], try 1 push, fail since w+1 == r
+//  w  r    size=3 here means full, cann't push/write again 
+// as we can see, without size variable, waste one slot
 template <typename T, size_t size>
 class LockFreeQueue
 {
@@ -62,20 +85,20 @@ public:
     {
         auto oldWritePos = writePos.load(); 
         auto newWritePos = getPositionAfter(oldWritePos);
-        if (newWritePos == readPos.load())
-            return false; // full. 
+        if (newWritePos == readPos.load()) // between write.load() and this, there might be pop already
+            return false; // full.         // but we don't care, just return false, let caller try again
         
         ringBuffer[oldWritePos] = newElement;
         // only write thread is updating the writePos
-        writePos.store(getPositionAfter(oldWritePos));
+        writePos.store(getPositionAfter(oldWritePos));//why not use newWritePos since only one writer?
         return false;
     }
     bool pop(T& returnedElement)
     {
         auto oldWritePos = writePos.load();
         auto oldReadPos = readPos.load();
-        if (oldWritePos == oldReadPos)
-            return false; // empty
+        if (oldWritePos == oldReadPos)  // between writePos.load() and this, there might be new write/push already, 
+            return false; // empty      // we do not care, just return false let caller try pop again
         // only read thread is updating the readPos 
         returnedElement = std::move(ringBuffer[oldReadPos]);
         readPos.store(getPositionAfter(oldReadPos));
