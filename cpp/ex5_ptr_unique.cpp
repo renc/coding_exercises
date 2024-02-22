@@ -31,18 +31,22 @@ static_assert(sizeof(unique_ptr<int>) == 8);
 // they will result in different size 
 // functor as custom deleter
 struct Obj {
-    void operator()() {};
+    void operator()(int*) { };
 };
 static_assert(sizeof(std::tuple<int*, Obj>) == 8);
 struct IntDelete { void operator() (int*p) { delete p; } };
 static_assert(sizeof(std::tuple<int*, IntDelete>) == 8);
+static_assert(sizeof(unique_ptr<int, IntDelete>) == 8);
 // lambda type as custom deleter , https://fekir.info/post/decltype-lambda/
 auto lambda_deleter = [](int*p) { delete p; };
 static_assert(sizeof(std::tuple<int*, decltype(lambda_deleter)> ) == 8);
 // function pointer
 using func_ptr_del = void(*)(int*); 
+static_assert(sizeof(func_ptr_del) == 8);
 static_assert(sizeof(std::tuple<int*, func_ptr_del>) == 16);
 static_assert(sizeof(std::tuple<int*, std::function<void(int*)>>) == 40);
+static_assert(sizeof(unique_ptr<int*, func_ptr_del>) == 16);
+static_assert(sizeof(unique_ptr<int*, std::function<void(int*)>>) == 40);
 } // end namespace stl_mock 
 
 int main()
@@ -58,6 +62,7 @@ int main()
     std::cout << "p1 sz=" << sizeof(p1) << ".\n"; 
     return 0;
 }
+
 namespace abc {
 
 template <typename T, typename... Args>

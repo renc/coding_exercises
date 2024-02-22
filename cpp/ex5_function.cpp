@@ -1,6 +1,7 @@
 #include <memory> 
 #include <iostream> 
 // 2024/01 before reading this implement, please check type erase first (in hands-on-design-patterns-with-cpp/Chapter06/smartptr.C)
+// ex5_ptr_unique.cpp, also show the size different between functor == lambda < func ptr < std::function 
 // 2023/11 ref: 2022 C++ Software Design Principles and Patterns , Guildline 32, std::function, std::any, std::shared_ptr  
 
 namespace cw {
