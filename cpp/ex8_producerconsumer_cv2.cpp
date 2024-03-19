@@ -98,8 +98,8 @@ public:
     // renc, why to remove front() and pop() for multiply customers ?
     // tbb concurrent_queue does not have front() and pop() functions.
     // https://www.threadingbuildingblocks.org/tutorial-intel-tbb-concurrent-containers 
-    // https://www.justsoftwaresolutions.co.uk/threading/implementing-a-thread-safe-queue-using-condition-variables.html
-    // 
+    // https://www.justsoftwaresolutions.co.uk/threading/implementing-a-thread-safe-queue-using-condition-variables.html  
+    //  this has another func void wait_pop(T& destination) which will wait/block and pop to get the data.
     bool try_pop(T &destination) {
         std::lock_guard<std::mutex> lk(m_mtx);
         if (m_queue.empty())

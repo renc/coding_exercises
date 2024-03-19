@@ -13,9 +13,9 @@ constexpr int pow(int a)
 template <typename T>
 concept Number = std::is_floating_point_v<T> || std::is_integral_v<T>; 
 
-template <int N, template T>
+template <int N, typename T>  // template<int N, Number T >
 requires Number<T> 
-auto const_pow_n(const T& v)
+constexpr auto const_pow_n(const T& v)
 {
     static_assert(N >= 0, "N must be positive");
     auto product = T{1};
@@ -31,6 +31,7 @@ void test()
     static_assert(pow<0>(2) == 1);
     static_assert(pow<3>(2) == 8);
     static_assert(pow<4>(2) == 16);
+    static_assert(const_pow_n<4>(2) == 16);
 }
 }
 

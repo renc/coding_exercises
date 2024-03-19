@@ -44,3 +44,4 @@ when len=0 for emptry string, cap is the _S_local_capacity for the local buf
 The results are different using g++ 4.8.5 without sso, g++ 9 with sso  
 without sso: sizeof(str) always == sizeof pointer
 */
+// ref https://devblogs.microsoft.com/oldnewthing/20230803-00/?p=108532 Inside STL: The string The old new thing

@@ -63,6 +63,7 @@ struct Mallocator
     template<class U>
     constexpr Mallocator(const Mallocator <U>&) noexcept {}
  
+    // the four interfaces (allocate, deallocate, operator==, operator!=);
     [[nodiscard]] T* allocate(std::size_t n)
     {
         if (n > std::numeric_limits<std::size_t>::max() / sizeof(T))
@@ -76,7 +77,7 @@ struct Mallocator
  
         throw std::bad_alloc();
     } // i think this is similar to the above version using ::operation new, because new do malloc and bad_alloc too.
- 
+    // allocate could throw exception, while deallocate noexcept,
     void deallocate(T* p, std::size_t n) noexcept
     {
         //report(p, n, 0);
@@ -102,8 +103,9 @@ bool operator!=(const Mallocator <T>&, const Mallocator <U>&) { return false; }
 #include <cstdint> // std::uintptr_t 
 namespace cpphp {
 // from chapter 7, C++ High Performance by Bjorn ...
-// a nwe expression involves two things: allocation and construction. 
-// allocation:  operator new allocate memory, u can overload it globally or per class to customize dynamic memory management. this normally return void*
+// a new expression involves two things: allocation and construction. 
+// allocation:  operator new allocate memory, u can overload it globally or per class to customize dynamic memory management. 
+//              this normally return void*
 //              for container allocator, it is still how to get memory. this normally return reinterpret_cast<T*>(void * from above );
 // construction: this is about construct an object in an already allocated memory area, which is where placement new can be used. 
 
@@ -114,10 +116,10 @@ class Arena {
     static constexpr size_t alignment = alignof(std::max_align_t);
 public:
     Arena() noexcept : ptr_(buffer_) {}
-    Arena(const Arena&) = delete;
-    Arena& operator=(const Arena&) = delete;
+    Arena(const Arena&) = delete; // not copyable 
+    Arena& operator=(const Arena&) = delete; // not copyable 
 
-    auto reset() noexcept { ptr_ = buffer_; }
+    auto reset() noexcept { ptr_ = buffer_; } // reset the ptr to the biginning of the buf
     static constexpr auto size() noexcept { return N; }
     auto used() const noexcept { return static_cast<size_t>(ptr_ - buffer_); }
     auto allocate(size_t n) -> std::byte*;
@@ -131,7 +133,7 @@ private:
         return std::uintptr_t(p) >= std::uintptr_t(buffer_) &&
                std::uintptr_t(p) <  std::uintptr_t(buffer_)+N;
     }
-    alignas(alignment) std::byte buffer_[N];
+    alignas(alignment) std::byte buffer_[N]; // vs char buffer_[N];
     std::byte* ptr_{};
 };  
 template <size_t N>
@@ -180,8 +182,9 @@ struct ShortAlloc {
     ShortAlloc(const ShortAlloc<U, N>& other) noexcept : arena_{other.arena_} {} 
     template <typename U> struct rebind { using other = ShortAlloc<U, N>; };
 
-    auto allocate(size_t n) -> T* { return reinterpret_cast<T*>(arena_->allocate(n*sizeof(T))); }
-    auto deallocate(T* p, size_t n) noexcept -> void { arena_->deallocate(reinterpret_cast<std::byte*>(p), n*sizeof(T)); }
+    // the four interfaces (allocate, deallocate, operator==, operator!=);
+    auto allocate(size_t n) -> T* { return reinterpret_cast<T*>(arena_->allocate(n*sizeof(T))); } // allocate could throw 
+    auto deallocate(T* p, size_t n) noexcept -> void { arena_->deallocate(reinterpret_cast<std::byte*>(p), n*sizeof(T)); } // deallocate noexcept 
 
     template <class U, size_t M>
     auto operator==(const ShortAlloc<U, M>& other) const noexcept { return N == M && arena_ == other.arena_; }
@@ -192,6 +195,11 @@ struct ShortAlloc {
 private:
     arena_type* arena_;
 }; // end ShortAlloc
+// using ShortAlloc<T, N> in container; 
+//   one more thing to check is  for std::set, its definination is:
+//      template<typename _Key, typename _Compare = std::less<_Key>, typename _Alloc = std::allocator<_Key> >
+//      class set { ... };
+//   it is using std::allocator<T> by default, which use ::new, ::delete to allocalte memory without need of N as we do here.
 void testShortAlloc()
 {
     using SmallSet = ::std::set<int, std::less<int>, ShortAlloc<int, 512>>;
@@ -206,8 +214,10 @@ void testShortAlloc()
     for (const auto& num : unique_numbers)
         ::std::cout << num << "\n";
 }
-// issue is for function: void funcX(std::set<int, std::less<int>& aa) {}; // we cannot pass our SmallSet into this func, because the allocator becomes a part of the type
-// This problem of ending up with different types when using different allocators was addressed in C++17 by introducing an extra layer, which is std::pmr::polymorphic_allocator.
+// One issue is when using function: void funcX(std::set<int, std::less<int>& aa) {}; // we cannot pass our SmallSet into this func, 
+// because the allocator becomes a part of the type. 
+// This problem of ending up with different types when using different allocators was addressed in C++17 by introducing an extra layer, 
+// which is std::pmr::polymorphic_allocator.
 // Memory resources:
 //  std::pmr::monotonic_buffer_resource , similar to our Arena class, for short lifetime objects.
 //  std::pmr::unsynchronized_pool_resource, 

@@ -37,7 +37,7 @@ struct function<Ret (Param ... )>
     std::unique_ptr<callable_interface> m_actual_callable; // renc, dynamic memory, (law latency no)
 };
 
-// a more generic, not limit to function pointer say int (int, int) , to support lambda 
+// a more generic, not limit to function pointer say int (int, int) , to support lambda also
 namespace v2 {
 template <typename T>
 struct function; 

@@ -63,6 +63,73 @@ int main()
     return 0;
 }
 
+
+namespace n20240131 {
+template <typename T, typename Deleter = std::default_delete<T>>
+class ex_unique_ptr
+{
+private:
+    T *m_ptr {nullptr};
+    Deleter m_deleter;
+public:
+    ex_unique_ptr(T*ptr = nullptr, const Deleter& del=Deleter()): m_ptr(ptr), m_deleter(del) {}
+    ~ex_unique_ptr() { if (m_ptr) m_deleter(m_ptr); }
+    ex_unique_ptr(const ex_unique_ptr&) = delete;
+    ex_unique_ptr& operator=(const ex_unique_ptr&) = delete;
+    ex_unique_ptr(ex_unique_ptr&& other): m_ptr(other.m_ptr), m_deleter(std::move(other.m_deleter)) { other.m_ptr = nullptr; }
+    ex_unique_ptr& operator=(ex_unique_ptr&& other) {
+        if (m_ptr != other.m_ptr) {
+            if (m_ptr) m_deleter(m_ptr);
+            m_ptr = other.m_ptr;
+            m_deleter = std::move(other.m_deleter);
+            other.m_ptr = nullptr;
+        }
+        return *this;
+    }
+
+    T& operator*() const { return *m_ptr; }
+    T* operator->() const { return m_ptr; }
+    T* get() const { return m_ptr; }
+};
+
+// to support arrays
+template <typename T, typename Deleter>
+class ex_unique_ptr<T[], Deleter>
+{
+private:
+    T *m_ptr {nullptr};
+    Deleter m_deleter;
+public:
+    ex_unique_ptr(T*ptr = nullptr, const Deleter& del=Deleter()): m_ptr(ptr), m_deleter(del) {}
+    ~ex_unique_ptr() { if (m_ptr) m_deleter(m_ptr); }
+    ex_unique_ptr(const ex_unique_ptr&) = delete;
+    ex_unique_ptr& operator=(const ex_unique_ptr&) = delete;
+    ex_unique_ptr(ex_unique_ptr&& other): m_ptr(other.m_ptr), m_deleter(std::move(other.m_deleter)) { other.m_ptr = nullptr; }
+    ex_unique_ptr& operator=(ex_unique_ptr&& other) {
+        if (m_ptr != other.m_ptr) {
+            if (m_ptr) m_deleter(m_ptr);
+            m_ptr = other.m_ptr;
+            m_deleter = std::move(other.m_deleter);
+            other.m_ptr = nullptr;
+        }
+        return *this;
+    }
+
+    T& operator[](std::size_t i) const { return m_ptr[i]; } 
+}; // there is a double free/delete bug here, 
+void test() 
+{
+    ex_unique_ptr<int []> ptr(new int[10]);
+    for (std::size_t ii = 0; ii < 10; ++ii) ptr[ii] = ii *10;
+    for (std::size_t ii = 0; ii < 10; ++ii) assert(ptr[ii] == (int) ii*10);
+
+    auto ptr2 = std::move(ptr); // todo: fix a bug here
+    for (std::size_t ii = 0; ii < 10; ++ii) assert(ptr2[ii] == (int) ii*10);
+}
+
+} // end of namespace n20240131 
+
+
 namespace abc {
 
 template <typename T, typename... Args>
