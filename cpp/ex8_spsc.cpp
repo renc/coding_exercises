@@ -9,6 +9,7 @@
 // consumer: load writer index value for checking whether there is element to read, store reader index at last;
 // https://stackoverflow.com/questions/14142023/why-is-a-single-producer-single-consumer-circular-queue-thread-safe-without-lock
 
+
 #include <atomic>
 #include <cstddef>
 #include <utility> // std::optional
@@ -38,7 +39,7 @@ class LockFreeQueue {
 
     bool do_push(auto&& t) { // helper func
         if (size_.load() == N) return false; // full , this is sequencial consistent memory order
-        buffer_[write_pos_] = std::forward<decltype(t)>(t);
+        buffer_[write_pos_] = std::forward<decltype(t)>(t); // do this writting before updating the index
         write_pos_ = (write_pos_ + 1) % N;
         size_.fetch_add(1); // size_.store(size_ + 1); ok ? do the actually writting ahead
     }
@@ -115,6 +116,8 @@ private:
 };
 
 } // end of namespace timer
+// folly spsc <-- read this too, it is similar https://github.com/facebook/folly/blob/main/folly/ProducerConsumerQueue.h
+
 
 namespace kjel {
 // renc: // write pos : point to last element +1.  read pos: point to the current elem can be read.

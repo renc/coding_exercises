@@ -8,6 +8,26 @@
 #include <tuple>
 #include <memory>
 #include <functional> 
+#include <cassert>
+
+
+namespace cppinsign_1 {
+// https://andreasfertig.blog/2024/07/understanding-the-inner-workings-of-cpp-smart-pointers-the-unique_ptr/
+
+template <typename T>
+class unique_ptr {
+    T* mPtr{};
+public:
+    unique_ptr() = default;
+    unique_ptr(T* ptr) : mPtr(ptr) {};
+    unique_ptr(const unique_ptr&) = delete;
+    unique_ptr operator=(const unique_ptr&) = delete;
+    
+};
+
+
+};
+
 namespace stl_mock {
 template <typename _Tp, typename _Dp>
 class unique_ptr_imp {
