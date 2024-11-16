@@ -1,6 +1,6 @@
 /*
 https://leetcode.com/discuss/interview-question/3349116/Squarepoint-Capital-or-Bangalore-or-OA-or-Cpp
-i love this question, it invokes so many topics
+i love this interview question, it invokes so many topics
 */
 #include <type_traits>
 #include <memory>
