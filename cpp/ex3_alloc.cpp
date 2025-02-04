@@ -176,7 +176,7 @@ struct ShortAlloc {
     using arena_type = Arena<N>; // ok, we know Arena is about N size, without knowning type T. 
     ShortAlloc(const ShortAlloc&) = default;
     ShortAlloc& operator=(const ShortAlloc&) = default;
-    ShortAlloc(arena_type& arena) noexcept : arena_{&arena} {} // ctro, need input of arena_type, is it better to create it inside wo relay on input from outside? like abm:: did
+    ShortAlloc(arena_type& arena) noexcept : arena_{&arena} {} // ctor, need input of arena_type, is it better to create it inside wo relay on input from outside? like abm:: did
     
     template <typename U>
     ShortAlloc(const ShortAlloc<U, N>& other) noexcept : arena_{other.arena_} {} 

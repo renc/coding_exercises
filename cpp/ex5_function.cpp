@@ -134,6 +134,11 @@ namespace part2 {
 } // end namespace ms
 
 
+void test()
+{
+    std::function<int (void)> f;
+}
+
 int main()
 {
     cw::test();

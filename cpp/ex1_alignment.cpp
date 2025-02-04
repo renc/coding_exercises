@@ -1,5 +1,10 @@
 #include <cstdint>
 #include <iostream>
+#include <memory> // std::align
+#include <bit> // has_single_bit 
+#include <limits>
+#include <assert.h>
+
 uint32_t testNotAlign()
 {
     long long x = 0;
@@ -9,6 +14,16 @@ uint32_t testNotAlign()
     return *ptr;
 }
 
+bool is_algined(void *ptr, std::size_t alignment )
+{
+    assert(ptr != nullptr);
+    assert(std::has_single_bit(alignment)); // x && !(x &(x-1))
+
+    auto s = std::numeric_limits<std::size_t>::max();
+    auto aligned_ptr = ptr;
+    std::align(alignment, 1, aligned_ptr, s);
+    return ptr == aligned_ptr;
+}
 int main()
 {
     testNotAlign();

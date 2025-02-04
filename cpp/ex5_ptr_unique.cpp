@@ -23,10 +23,61 @@ public:
     unique_ptr(const unique_ptr&) = delete;
     unique_ptr operator=(const unique_ptr&) = delete;
     
+    unique_ptr(unique_ptr&& src) : mPtr{src.mPtr} { src.mPtr = nullptr; }
+    unique_ptr& operator=(unique_ptr&& src) {
+        delete mPtr;
+        mPtr = src.mPtr;
+        src.mPtr = nullptr;
+        return *this;
+    }
+    ~unique_ptr() {
+        static_assert(sizeof(T) >= 0, "cannot delete anincomplete type");
+        delete mPtr;
+    }
+    T* operator->() { return mPtr; }
+};
 };
 
+namespace n20241122 {
+    // https://andreasfertig.blog/2024/08/understanding-the-inner-workings-of-cpp-smart-pointers-the-unique_ptr-with-custom-deleter/
+template<typename T>
+struct DefaultDeleter { void operator()(T* ptr) { delete ptr; } }; 
 
+template <typename T, typename Del,
+    bool hasEmptyBase = std::is_empty_v<Del> && not std::is_final_v<Del>>
+struct compressed_pair {
+    T* data{}; 
+    Del* deleter{};
+    compressed_pair() = default;
+    compressed_pair(T* ptr, Del* del) : data{ptr}, deleter{del} {} 
+
+    T* first() { return data; }
+    Del& second() { return *deleter; }
 };
+
+template<typename T, typename Del>
+struct compressed_pair<T, Del, true> : public Del {
+    T* data{};
+    compressed_pair()=defalut;
+    compressed_pair(T* ptr) : data{ptr}  {}
+    T* first() { return data; }
+    Del& second() { return *this; }
+};
+
+template <typename T, typename Deleter= DefaultDeleter<T> >
+class unique_ptr {
+    compressed_pair<T, Deleter> mPtr{};
+public:
+    unique_ptr() = default;
+    unique_ptr(T* ptr) : mPtr{ptr} {}
+    unique_ptr(T* ptr, Deleter* del) mPtr(ptr, del) {} // del is the second parameter
+
+    unique_ptr(const unique_ptr& ) = delete;
+    unique_ptr& operator=(const unique_ptr&) = delete;
+
+    unique_ptr(unique_ptr && src): mPtr{src.mPtr.data, src.mPtr.deleter} {}
+}; // end of unique_ptr 
+}
 
 namespace stl_mock {
 template <typename _Tp, typename _Dp>

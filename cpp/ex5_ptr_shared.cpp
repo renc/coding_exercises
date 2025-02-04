@@ -6,6 +6,10 @@
 
 #include <iostream>
 #include <string>
+#include <atomic>
+
+
+
 // custom shared_ptr , this version does not consider the Deleter as template parameter
 template <typename T>
 class shptr
@@ -88,7 +92,7 @@ struct B: public A
     ~B() { std::cout << "B.dctr\n"; }
 };
 
-int main ()
+int test ()
 {
     if (0) {
         std::cout << "T1: \n";
@@ -124,6 +128,104 @@ int main ()
     }
     return 0; 
 }
+
+//-----------------------------------------------------
+namespace ns20241116 {
+//https://andreasfertig.blog/2024/09/understanding-the-inner-workings-of-cpp-smart-pointers-the-shared_ptr/ 
+struct ctrl_blk_base {
+    std::atomic_uint64_t shared_ref_count_{1};
+    void add_shared() { ++ shared_ref_count_; }
+    void dec() { -- shared_ref_count_; }
+    virtual void release_shared() = 0;
+};
+
+template <typename T>
+struct ctrl_blk : ctrl_blk_base {
+    T* data_; // payload 
+
+    explicit ctrl_blk(T* data) : crbl_blk_base{}, data_(data) {}
+    void release_shared() override {
+        if (dec() == 0) {
+            delete data_;
+            delete this; // self delete, this is new to me
+        }
+    }
+};
+
+template <typename T>
+struct ctrl_blk_with_storage : ctrl_blk_base {
+    T in_place_;
+
+    template <typename... Args>
+    explicit ctrl_blk_with_storage(Args&&... vals) : ctrl_blk_base{}, in_place_{std::forward<Args>(vals)...} {}
+    
+    T* get() { return &in_place_; }
+    void release_shared() override {
+        if (dec() == 0) { delete this; } // self delete
+    }
+}; // used by make_shared<>
+
+
+template <typename T>
+class shared_ptr {
+    ctrl_blk_base* ctrl_blk_{};
+    T*             t_{};
+
+    shared_ptr(ctrl_blk_with_storage<T>* cb) : shared_ptr(cb, cb->get()) {}
+    shared_ptr(ctrl_blk_base* cb, T* t) : ctrl_blk_{cb}, t_{t} {} 
+
+    template <typename T, typename... Args>
+    friend shared_ptr<T> make_shared(Args&&... vals);
+
+public:
+    shared_ptr() = delete;
+    shared_ptr(T* t) : shared_ptr(new ctrl_blk<T>{t}, t) {} // bug ? if t== nullptr
+    ~shared_ptr() {
+        if (ctrl_blk_) { ctrl_blk_->release_shared(); }
+    }
+
+    shared_ptr(const shared_ptr& rhs)
+    : ctrl_blk_(rhs.ctrl_blk_), t_(rhs.t_) {
+        if (ctrl_blk_) ctrl_blk_->add_shared();
+    }
+    shared_ptr(shared_ptr&& rhs) : ctrl_blk_{rhs.ctrl_blk_}, t_t(rhs.t_) {
+        rhs.ctrl_blk_ = nullptr;
+        rhs.t_        = nullptr;
+    }
+
+    shared_ptr& operator=(const shared_ptr& rhs) {
+        shared_ptr{rhs}.swap(*this); //forward to copy ctor
+        return *this;
+    } // it is a clever trick, create a new temporary shared_ptr object 
+    shared_ptr& operator=(shared_ptr&& rsh) {
+        shared_ptr{std::move(rsh)}.swap(*this); // forward to move ctor
+        return *this;
+    } 
+
+    void swap(shared_ptr& rhs) {
+        std::swap(ctrl_blk_, rhs.ctrl_blk_);
+        std::swap(t_, rhs.t_);
+    }
+};
+
+template <typename T, typename... Args>
+shared_ptr<T> make_shared(Args&& vals)
+{
+    return new ctrl_blk_with_storage(std::forward<Args>(vals)...); // this will trigger the shared_ptr ctr
+}
+}
+
+int main()
+{
+    test();
+
+    // 
+
+}
+
+
+
+
 
 /*
 ~/ws/coding_exercises/cpp$ rm ex5_shptr; clear; g++ -o ex5_shptr ex5_shptr.cpp ; ./ex5_shptr
